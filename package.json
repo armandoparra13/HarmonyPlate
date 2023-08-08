@@ -4,7 +4,7 @@
   "description": "Connecting people through food and music",
   "main": "index.js",
   "scripts": {
-    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "install:all": "npm install && cd front && npm install && cd ../backend && npm install",
     "start": "concurrently \"cd backend && npm start\" \"cd front && npm start\""
   },
   "repository": {
