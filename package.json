@@ -1,0 +1,23 @@
+{
+  "name": "harmonyplate",
+  "version": "1.0.0",
+  "description": "Connecting people through food and music",
+  "main": "index.js",
+  "scripts": {
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "start": "concurrently \"cd backend && npm start\" \"cd front && npm start\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/armandoparra13/HarmonyPlate.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/armandoparra13/HarmonyPlate/issues"
+  },
+  "homepage": "https://github.com/armandoparra13/HarmonyPlate#readme",
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}
