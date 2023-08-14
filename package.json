@@ -19,5 +19,8 @@
   "homepage": "https://github.com/armandoparra13/HarmonyPlate#readme",
   "devDependencies": {
     "concurrently": "^8.2.0"
+  },
+  "dependencies": {
+    "firebase": "^10.1.0"
   }
 }
