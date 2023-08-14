@@ -4,19 +4,17 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../firebase';
 import { NavLink, useNavigate } from 'react-router-dom';
 
-/*
-export const LoginPage = () => {
-  return (
-    <div className="LoginPage">
-        <h1>This is Log-in Page!</h1>
-    </div>
-  );
-}
-
-*/
-
 function LoginPage() {
   const [loginFormActive, setLoginFormActive] = useState(false);
+  const [backendData, setBackendData] = useState([{}]);
+
+  useEffect(() => {
+    fetch("/api").then(response => {
+      response.json()
+    }).then(data => {
+      setBackendData(data)
+    })
+  }, [])
 
   const toggleLoginForm = () => {
     setLoginFormActive(true);
@@ -34,7 +32,6 @@ function LoginPage() {
     e.preventDefault();
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        // Signed in
         const user = userCredential.user;
         navigate('/create-profile');
         console.log(user);
