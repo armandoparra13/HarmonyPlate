@@ -2,6 +2,7 @@
   "name": "harmonyplate",
   "version": "1.0.0",
   "description": "Connecting people through food and music",
+  "proxy": "http://localhost:5000",
   "main": "index.js",
   "scripts": {
     "install:all": "npm install && cd front && npm install && cd ../backend && npm install",
