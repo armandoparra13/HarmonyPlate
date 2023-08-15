@@ -1,50 +1,63 @@
-//insert stuff here
-/*
-<!DOCTYPE html>
-<html lang="en">
+import React, { useState } from 'react';
+import './SignUp.css';
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Harmony Plate - Sign Up</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
+const SignUp = () => {
+    const [formData, setFormData] = useState({
+        name: '',
+        dob: '',
+        password: '',
+        confirmPassword: '',
+        gender: 'male'
+    });
 
-<body>
-    <div class="container">
-        <h2>Sign Up</h2>
-        <form action="/submit" method="post">
-            <div class="input-group">
-                <label for="name">Name:</label>
-                <input type="text" id="name" name="name" required>
-            </div>
-            <div class="input-group">
-                <label for="dob">Date of Birth:</label>
-                <input type="date" id="dob" name="dob" required>
-            </div>
-            <div class="input-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <div class="input-group">
-                <label for="confirm-password">Retype Password:</label>
-                <input type="password" id="confirm-password" name="confirm-password" required>
-            </div>
-            <div class="input-group">
-                <label for="gender">Gender:</label>
-                <select id="gender" name="gender">
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="nonbinary">Nonbinary</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <button type="submit">Sign Up</button>
-            </div>
-        </form>
-    </div>
-</body>
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
+    };
 
-</html>
-*/
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        // TODO: Add form submission logic here
+        console.log(formData);
+    };
+
+    return (
+        <div className="container">
+            <h2>Harmony Plate Sign Up</h2>
+            <form onSubmit={handleSubmit}>
+                <div className="input-group">
+                    <label htmlFor="name">Name:</label>
+                    <input type="text" id="name" name="name" required onChange={handleChange} value={formData.name} />
+                </div>
+                <div className="input-group">
+                    <label htmlFor="dob">Date of Birth:</label>
+                    <input type="date" id="dob" name="dob" required onChange={handleChange} value={formData.dob} />
+                </div>
+                <div className="input-group">
+                    <label htmlFor="password">Password:</label>
+                    <input type="password" id="password" name="password" required onChange={handleChange} value={formData.password} />
+                </div>
+                <div className="input-group">
+                    <label htmlFor="confirmPassword">Retype Password:</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required onChange={handleChange} value={formData.confirmPassword} />
+                </div>
+                <div className="input-group">
+                    <label htmlFor="gender">Gender:</label>
+                    <select id="gender" name="gender" onChange={handleChange} value={formData.gender}>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="nonbinary">Nonbinary</option>
+                    </select>
+                </div>
+                <div className="input-group">
+                    <button type="submit">Sign Up</button>
+                </div>
+            </form>
+        </div>
+    );
+}
+
+export default SignUp;
