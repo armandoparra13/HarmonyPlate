@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './LoginPage.css';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../firebase';
@@ -9,12 +9,14 @@ function LoginPage() {
   const [backendData, setBackendData] = useState([{}]);
 
   useEffect(() => {
-    fetch("/api").then(response => {
-      response.json()
-    }).then(data => {
-      setBackendData(data)
-    })
-  }, [])
+    fetch('/api')
+      .then((response) => {
+        response.json();
+      })
+      .then((data) => {
+        setBackendData(data);
+      });
+  }, []);
 
   const toggleLoginForm = () => {
     setLoginFormActive(true);
