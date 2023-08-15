@@ -72,9 +72,18 @@ app.get("/api", (req, res) => {
 
 app.get("/search", (req, res) => {
   let query = req.query.query;
-  axios.get(`${spoonacularUrl}recipes/complexSearch?query=${query}&apiKey=${spoonacularApi}`).then(response => {
-    console.log(response.data.results);
-    res.status(200).send({});
+  let cuisine = req.query.cuisine;
+
+  if (!query) {
+    res.status(400).send({ "error": "Invalid Query" });
+  }
+
+  if (!cuisine) {
+    res.status(400).send({ "error": "No cuisine chosen" });
+  }
+
+  axios.get(`${spoonacularUrl}recipes/complexSearch?query=${query}&cuisine=${cuisine}&apiKey=${spoonacularApi}`).then(response => {
+    res.status(200).send({ "options": response.data.results });
   })
   res.status(200);
 })
