@@ -1,18 +1,22 @@
-
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './LoginPage.css';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../firebase';
+import { NavLink, useNavigate } from 'react-router-dom';
 
 function LoginPage() {
   const [loginFormActive, setLoginFormActive] = useState(false);
   const [backendData, setBackendData] = useState([{}]);
 
   useEffect(() => {
-    fetch("/api").then(response => {
-      response.json()
-    }).then(data => {
-      setBackendData(data)
-    })
-  }, [])
+    fetch('/api')
+      .then((response) => {
+        response.json();
+      })
+      .then((data) => {
+        setBackendData(data);
+      });
+  }, []);
 
   const toggleLoginForm = () => {
     setLoginFormActive(true);
@@ -20,6 +24,25 @@ function LoginPage() {
 
   const goBack = () => {
     setLoginFormActive(false);
+  };
+
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const onLogin = (e) => {
+    e.preventDefault();
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        navigate('/create-profile');
+        console.log(user);
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorCode, errorMessage);
+      });
   };
 
   return (
@@ -40,16 +63,34 @@ function LoginPage() {
             Login
           </a>
         </div>
-        <div className={`login-form ${loginFormActive ? 'active' : ''}`} id="login-form">
-          <input type="email" placeholder="Email" id="email" />
+        <div
+          className={`login-form ${loginFormActive ? 'active' : ''}`}
+          id="login-form"
+        >
+          <input
+            type="email"
+            placeholder="Email address"
+            id="email"
+            onChange={(e) => setEmail(e.target.value)}
+          />
           <br />
-          <input type="password" placeholder="Password" id="password" />
+          <input
+            type="password"
+            placeholder="Password"
+            id="password"
+            onChange={(e) => setPassword(e.target.value)}
+          />
           <br />
           <button className="back-button" onClick={goBack}>
             &#8592;
           </button>
-          <button id="login-button">Login</button>
+          <button id="login-button" onClick={onLogin}>
+            Login
+          </button>
         </div>
+        <p className="text-sm text-white text-center">
+          No account yet? <NavLink to="/signup">Sign up</NavLink>
+        </p>
       </div>
     </div>
   );
