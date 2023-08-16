@@ -2,6 +2,7 @@
   "name": "harmonyplate",
   "version": "1.0.0",
   "description": "Connecting people through food and music",
+  "proxy": "http://localhost:5000",
   "main": "index.js",
   "scripts": {
     "install:all": "npm install && cd front && npm install && cd ../backend && npm install",
@@ -19,5 +20,8 @@
   "homepage": "https://github.com/armandoparra13/HarmonyPlate#readme",
   "devDependencies": {
     "concurrently": "^8.2.0"
+  },
+  "dependencies": {
+    "firebase": "^10.1.0"
   }
 }
