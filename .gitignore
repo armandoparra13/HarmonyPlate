@@ -23,3 +23,8 @@ yarn-debug.log*
 yarn-error.log*
 
 firebase_config.json
+front/src/env.json
+
+
+front/src/env.json
+firebase_config.json

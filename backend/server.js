@@ -58,5 +58,4 @@ app.post("/signup",  (req, res) => {
 
 app.listen(port, hostname, () => {
     console.log(`http://${hostname}:${port}`);
-});
-
+})
