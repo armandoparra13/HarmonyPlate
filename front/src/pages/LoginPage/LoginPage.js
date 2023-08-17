@@ -6,17 +6,6 @@ import { NavLink, useNavigate } from 'react-router-dom';
 
 function LoginPage() {
   const [loginFormActive, setLoginFormActive] = useState(false);
-  const [backendData, setBackendData] = useState([{}]);
-
-  useEffect(() => {
-    fetch('/api')
-      .then((response) => {
-        response.json();
-      })
-      .then((data) => {
-        setBackendData(data);
-      });
-  }, []);
 
   const toggleLoginForm = () => {
     setLoginFormActive(true);
@@ -45,6 +34,10 @@ function LoginPage() {
       });
   };
 
+  const onSignUp = () => {
+    navigate("/Signup")
+  }
+
   return (
     <div>
       <img src="https://media.giphy.com/media/h7uTwqEHysbd2lhyDP/giphy.gif" />
@@ -53,7 +46,7 @@ function LoginPage() {
         <div className="title">Harmony Plate</div>
         <div className="button-group" id="button-group">
           <a className={`button signup ${loginFormActive ? 'hidden' : ''}`}
-            onClick={navigate("/signup")}
+            onClick={onSignUp}
           >
             Sign Up
           </a>
