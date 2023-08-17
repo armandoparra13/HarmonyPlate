@@ -52,7 +52,9 @@ function LoginPage() {
       <div className="card">
         <div className="title">Harmony Plate</div>
         <div className="button-group" id="button-group">
-          <a className={`button signup ${loginFormActive ? 'hidden' : ''}`}>
+          <a className={`button signup ${loginFormActive ? 'hidden' : ''}`}
+            onClick={navigate("/signup")}
+          >
             Sign Up
           </a>
           <a
