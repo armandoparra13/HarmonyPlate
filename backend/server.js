@@ -1,7 +1,7 @@
 import express from 'express';
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, set } from "firebase/database";
-import firebaseConfig from './firebase_config.json' assert { type: 'json' };
+import firebaseConfig from './env_backend.json' assert { type: 'json' };
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
 const app = express();
