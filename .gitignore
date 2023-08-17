@@ -22,9 +22,5 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-firebase_config.json
+env_backend.json
 front/src/env.json
-
-
-front/src/env.json
-firebase_config.json
