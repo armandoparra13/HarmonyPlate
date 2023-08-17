@@ -24,3 +24,4 @@ yarn-error.log*
 
 env_backend.json
 front/src/env.json
+bfg.jar
