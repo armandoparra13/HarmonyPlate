@@ -1,13 +1,62 @@
-const express = require('express');
+import express from 'express';
+import { initializeApp } from 'firebase/app';
+import { getDatabase, ref, set } from "firebase/database";
+import firebaseConfig from './env_backend.json' assert { type: 'json' };
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+
 const app = express();
+app.use(express.json());
 
-let port = 5000;
-let hostname = 'localhost';
+// Initialize Firebase, Realtime Database, Authentication
+const firebaseApp = initializeApp(firebaseConfig);
+const database = getDatabase(firebaseApp);
+const auth = getAuth();
 
-app.get('/api', (req, res) => {
-  res.json({ users: ['userOne', 'userTwo'] });
+const port = 5000;
+const hostname = "localhost";
+
+app.post("/signup",  (req, res) => {
+    // verify input is valid
+    let body = req.body;
+    console.log(body);
+
+    if (
+        !body.hasOwnProperty("username") ||
+        !body.hasOwnProperty("email") ||
+        !body.hasOwnProperty("password") ||
+        body.username.trim() === "" || 
+        body.email.trim() === "" ||
+        !body.password.trim() === ""
+      ) {
+        return res.status(400).send("Invalid request.");
+      } 
+
+    // add user to Authentication (used for login)
+        //example of an acceptable json: {"username": "theGuy", "email": "abc@gmail.com", "password": "123456"}
+    createUserWithEmailAndPassword(auth, body.email, body.password)
+    .then((userCredential) => {
+        // Signed in 
+        //add user to Realtime Database (used to store user data other than login info)
+        let user = userCredential.user;
+        set(ref(database, 'users/' + user.uid), {
+            username: body.username,
+            email: body.email,
+            spotifyLinked: false
+        }).then(() => {
+            return res.send("User creation successful");
+        }).catch(() => {
+            console.log("Adding user to Database failure");
+            return res.status(500).send("Adding user to Database failure");
+        })
+        
+    })
+    .catch(() => {
+        console.log("User authentication creation failure");
+        return res.status(500).send("User authentication creation failure");
+    });
+
 });
 
 app.listen(port, hostname, () => {
-  console.log(`http://${hostname}:${port}`);
+    console.log(`http://${hostname}:${port}`);
 });
