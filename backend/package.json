@@ -2,12 +2,8 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-<<<<<<< HEAD
   "main": "server.cjs",
-=======
-  "main": "server.js",
   "proxy": "http://localhost:5000",
->>>>>>> 4287d66 (fetched data from express server)
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server"

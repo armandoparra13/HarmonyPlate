@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import express from 'express';
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, set } from "firebase/database";
@@ -6,12 +5,6 @@ import firebaseConfig from './env_backend.json' assert { type: 'json' };
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import axios from 'axios';
 import env from './env.json' assert {type: 'json'}
-=======
-const express = require('express');
-const app = express();
-const axios = require('axios');
-const env = require("./env.json");
->>>>>>> 4287d66 (fetched data from express server)
 
 const app = express();
 app.use(express.json());
