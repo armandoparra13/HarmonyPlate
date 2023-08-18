@@ -1,52 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 function FoodPage () {
     const [keyword, setKeyword] = useState('');
     const [cuisine, setCuisine] = useState('');
     const [diet, setDiet] = useState('');
-    const [backendData, setBackendData] = useState([{}]);
-    useEffect(() => {
-        fetch('/search')
-          .then((response) => {
-            response.json();
-          })
-          .then((data) => {
-            setBackendData(data);
-          });
-    }, []);
 
     const onSubmit = (e) => {
         e.preventDefault();
     
-        const searchData = {
-            keyword,
-            cuisine,
-            diet,
-        };
-    
-        fetch('/search', {
-            method: 'POST', // Assuming you want to use POST to send data to the backend
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(searchData),
+        fetch(`/search?query=${keyword}&cuisine=${cuisine}&diet=${diet}`)
+        .then((response) => {
+            console.log(response);
+            return response.json(); 
         })
-        .then((response) => response.json())
         .then((data) => {
-            // Handle the response from the backend, if needed
-            // For example, you can update the state with the fetched data
-            setBackendData(data);
+            console.log(data);
         })
         .catch((error) => {
             console.error('Error sending data to backend:', error);
         });
     }
-    
 
     return (
         <div>
             <div>
-                <label for="keyword">Keyword:</label>
+                <label>Keyword:</label>
                 <input 
                     id="keyword" 
                     type="text" 
@@ -57,7 +35,7 @@ function FoodPage () {
                 />
             </div>
             <div>
-                <label for="cuisine">Cuisine:</label>
+                <label>Cuisine:</label>
                 <select 
                     id="cuisine" 
                     name="cuisine" 
@@ -96,7 +74,7 @@ function FoodPage () {
                 </select>
             </div>
             <div>
-                <label for="diet">Diet:</label>
+                <label>Diet:</label>
                 <select 
                     id="diet" 
                     name="diet" 

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import express from 'express';
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, set } from "firebase/database";
@@ -5,6 +6,12 @@ import firebaseConfig from './env_backend.json' assert { type: 'json' };
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import axios from 'axios';
 import env from './env.json' assert {type: 'json'}
+=======
+const express = require('express');
+const app = express();
+const axios = require('axios');
+const env = require("./env.json");
+>>>>>>> 4287d66 (fetched data from express server)
 
 const app = express();
 app.use(express.json());
@@ -73,6 +80,9 @@ app.get("/api", (req, res) => {
 app.get("/search", (req, res) => {
   let query = req.query.query;
   let cuisine = req.query.cuisine;
+  let diet = req.query.diet;
+
+  console.log(req.query);
 
   if (!query) {
     res.status(400).send({ "error": "Invalid Query" });
@@ -81,6 +91,11 @@ app.get("/search", (req, res) => {
   if (!cuisine) {
     res.status(400).send({ "error": "No cuisine chosen" });
   }
+
+  if (!diet) {
+    res.status(400).send({ "error": "No diet chosen" });
+  }
+
 
   axios.get(`${spoonacularUrl}recipes/complexSearch?query=${query}&cuisine=${cuisine}&apiKey=${spoonacularApi}`).then(response => {
     res.status(200).send({ "options": response.data.results });
