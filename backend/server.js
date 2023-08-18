@@ -28,7 +28,7 @@ app.post("/signup",  (req, res) => {
         body.email.trim() === "" ||
         !body.password.trim() === ""
       ) {
-        return res.status(500).send("Invalid request.");
+        return res.status(400).send("Invalid request.");
       } 
 
     // add user to Authentication (used for login)
@@ -41,21 +41,22 @@ app.post("/signup",  (req, res) => {
         set(ref(database, 'users/' + user.uid), {
             username: body.username,
             email: body.email,
+            spotifyLinked: false
         }).then(() => {
             return res.send("User creation successful");
-        }).catch((error) => {
-            console.log("Adding user to Database failure", error.message);
-            return res.status(error.code).send(error.message);
+        }).catch(() => {
+            console.log("Adding user to Database failure");
+            return res.status(500).send("Adding user to Database failure");
         })
         
     })
-    .catch((error) => {
-        console.log("User authentication creation failure", error.message);
-        return res.status(error.code).send(error.message);
+    .catch(() => {
+        console.log("User authentication creation failure");
+        return res.status(500).send("User authentication creation failure");
     });
 
 });
 
 app.listen(port, hostname, () => {
     console.log(`http://${hostname}:${port}`);
-})
+});
