@@ -30,19 +30,19 @@ const SignUp = () => {
             <form onSubmit={handleSubmit}>
                 <div className="input-group">
                     <label htmlFor="name">Name:</label>
-                    <input type="text" id="name" name="name" required onChange={handleChange} value={formData.name} />
+                    <input className="custom-input" id="name" name="name" required onChange={handleChange} value={formData.name} />
                 </div>
                 <div className="input-group">
                     <label htmlFor="dob">Date of Birth:</label>
-                    <input type="date" id="dob" name="dob" required onChange={handleChange} value={formData.dob} />
+                    <input className="custom-input" type="date" id="dob" name="dob" required onChange={handleChange} value={formData.dob} />
                 </div>
                 <div className="input-group">
                     <label htmlFor="password">Password:</label>
-                    <input type="password" id="password" name="password" required onChange={handleChange} value={formData.password} />
+                    <input className="custom-input" id="password" name="password" required onChange={handleChange} value={formData.password} />
                 </div>
                 <div className="input-group">
                     <label htmlFor="confirmPassword">Retype Password:</label>
-                    <input type="password" id="confirmPassword" name="confirmPassword" required onChange={handleChange} value={formData.confirmPassword} />
+                    <input className="custom-input" id="confirmPassword" name="confirmPassword" required onChange={handleChange} value={formData.confirmPassword} />
                 </div>
                 <div className="input-group">
                     <label htmlFor="gender">Gender:</label>

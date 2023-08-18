@@ -70,7 +70,6 @@ function LoginPage() {
           />
           <br />
           <input
-            type="password"
             placeholder="Password"
             id="password"
             onChange={(e) => setPassword(e.target.value)}
