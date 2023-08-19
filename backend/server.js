@@ -78,22 +78,16 @@ app.get("/search", (req, res) => {
   console.log(req.query);
 
   if (!query) {
-    res.status(400).send({ "error": "Invalid Query" });
+    return res.status(400).send({ "error": "Invalid Query" });
   }
 
   if (!cuisine) {
-    res.status(400).send({ "error": "No cuisine chosen" });
+    return res.status(400).send({ "error": "No cuisine chosen" });
   }
 
-  if (!diet) {
-    res.status(400).send({ "error": "No diet chosen" });
-  }
-
-
-  axios.get(`${spoonacularUrl}recipes/complexSearch?query=${query}&cuisine=${cuisine}&apiKey=${spoonacularApi}`).then(response => {
-    res.status(200).send({ "options": response.data.results });
+  axios.get(`${spoonacularUrl}recipes/complexSearch?query=${query}&cuisine=${cuisine}${diet ? 'diet=' + diet : ''}&apiKey=${spoonacularApi}`).then(response => {
+    return res.status(200).send({ "options": response.data.results });
   })
-  res.status(200);
 })
 
 app.get("/recipe/:id", (req, res) => {
