@@ -35,7 +35,7 @@ label {
     border-radius: 4px;
 }
 
-button {
+.input-group-button {
     width: 100%;
     padding: 10px;
     background-color: #F28482; /* Updated color */

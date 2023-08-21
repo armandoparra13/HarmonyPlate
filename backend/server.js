@@ -84,10 +84,36 @@ app.get("/search", (req, res) => {
   if (!cuisine) {
     return res.status(400).send({ "error": "No cuisine chosen" });
   }
-
-  axios.get(`${spoonacularUrl}recipes/complexSearch?query=${query}&cuisine=${cuisine}${diet ? 'diet=' + diet : ''}&apiKey=${spoonacularApi}`).then(response => {
+  let url = `${spoonacularUrl}recipes/complexSearch?query=${query}&cuisine=${cuisine}${diet ? '&diet=' + diet : ''}&apiKey=${spoonacularApi}`
+  axios.get(url).then(response => {
+    console.log(url)
     return res.status(200).send({ "options": response.data.results });
   })
+})
+
+app.post("/foodChoice", (req, res) => {
+  // verify input is valid
+  let body = req.body;
+
+  if (
+    !body.hasOwnProperty("chosenFood") ||
+    body.chosenFood.trim() === ""
+  ) {
+    return res.status(400).send("Invalid request.");
+  }
+
+  console.log(body.chosenFood)
+  /*let user = userCredential.user;
+  set(ref(database, 'users/' + user.uid), {
+    username: body.username,
+    email: body.email,
+    spotifyLinked: false
+  }).then(() => {
+    return res.send("User creation successful");
+  }).catch(() => {
+    console.log("Adding user to Database failure");
+    return res.status(500).send("Adding user to Database failure");
+  })*/
 })
 
 app.get("/recipe/:id", (req, res) => {

@@ -1,24 +1,26 @@
 import React, { useState } from 'react';
+import "./FoodPage.css"
 
 function FoodPage() {
     const [keyword, setKeyword] = useState('');
     const [cuisine, setCuisine] = useState('');
     const [diet, setDiet] = useState('');
-    const [validSearch, setValidSearch] = useState(true);
+    const [validSearch, setValidSearch] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [options, setOptions] = useState([]);
+    const [optionChosen, setOptionChosen] = useState('');
 
     const onSubmit = (e) => {
         e.preventDefault();
+        setOptionChosen([]);
 
         fetch(`/search?query=${keyword}&cuisine=${cuisine}&diet=${diet}`)
             .then((response) => {
-                console.log(response);
                 return response.json();
             })
             .then((data) => {
                 if (data.error) {
-                    setValidSearch(false);
+                    setValidSearch(true);
                     setErrorMessage(data.error);
                 } else {
                     setValidSearch(true);
@@ -30,6 +32,30 @@ function FoodPage() {
             .catch((error) => {
                 console.error('Error sending data to backend:', error);
             });
+    }
+
+    const onChoose = (e) => {
+        const previouslySelected = document.querySelector('.selected-option');
+        if (previouslySelected) {
+            previouslySelected.classList.remove('selected-option');
+        }
+        e.target.classList.add('selected-option');
+        setOptionChosen(e.target.id);
+
+    }
+
+    const submitChoice = (e) => {
+        if (options.length === 0 || optionChosen) {
+            console.log(optionChosen);
+            fetch('/foodChoice',
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chosenFood: optionChosen })
+
+                })
+        }
+
     }
 
     return (
@@ -48,7 +74,7 @@ function FoodPage() {
             <div>
                 <label>Cuisine:</label>
                 <select
-                    id="cuisine"
+                    class="cuisine"
                     name="cuisine"
                     onClick={(e) => (
                         setCuisine(e.target.value)
@@ -87,7 +113,7 @@ function FoodPage() {
             <div>
                 <label>Diet:</label>
                 <select
-                    id="diet"
+                    class="diet"
                     name="diet"
                     onClick={(e) => (
                         setDiet(e.target.value))}
@@ -106,18 +132,22 @@ function FoodPage() {
                     <option value="whole30">Whole30</option>
                 </select>
             </div>
-            <div id="error">
-                {!validSearch && errorMessage}
+            <button class="submit" onClick={onSubmit}>Search</button>
+            <div class="options">
+                {!validSearch ? (
+                    <div>{errorMessage}</div>
+                ) : options.length === 0 ? (<div>No options found. Change choices or finish.</div>) : (
+                    <>
+                        <div>Which one sounds the best to you</div>
+                        {options.map((data, i) => (
+                            <button className="option" id={data.id} key={i} name={data.title} onClick={onChoose}>{data.title}</button>
+                        ))}
+                    </>
+                )}
             </div>
-            <button id="submit" onClick={onSubmit}>Search</button>
-            <div id="options">
-                {validSearch && <div>Which one sounds the best to you</div> && options.map((data, i) => {
-                    return (
-                        <button key={i}>{data.title}</button>
-                    )
-                })}
-            </div>
-        </div>
+
+            {validSearch && <button class="submit" onClick={submitChoice}>Finish</button>}
+        </div >
     );
 }
 export default FoodPage;
