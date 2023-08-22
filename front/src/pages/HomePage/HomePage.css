@@ -1,0 +1,56 @@
+.home-container {
+    display: flex;
+}
+
+.navbar {
+    flex-basis: 0;
+    overflow: hidden;
+    transition: flex-basis 0.3s ease;
+    background-color: #f4f4f4;
+    padding: 15px;
+    height: 100vh;
+}
+
+.navbar.open {
+    flex-basis: 200px;
+}
+
+.toggle-nav {
+    margin-bottom: 20px;
+}
+
+.main-content {
+    flex: 1;
+    padding: 20px;
+}
+
+.match-box {
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.like-btn {
+    background-color: #4CAF50; /* Green color for like */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.skip-btn {
+    background-color: #f44336; /* Red color for skip */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+}
