@@ -45,9 +45,13 @@ app.post("/signup", (req, res) => {
     !body.hasOwnProperty("username") ||
     !body.hasOwnProperty("email") ||
     !body.hasOwnProperty("password") ||
+    !body.hasOwnProperty("gender") ||
+    !body.hasOwnProperty("dateOfBirth") ||
+    body.gender.trim() === "" ||
+    body.dateOfBirth.trim() === "" ||
     body.username.trim() === "" ||
     body.email.trim() === "" ||
-    !body.password.trim() === ""
+    body.password.trim() === ""
   ) {
     return res.status(400).send("Invalid request.");
   }
@@ -62,6 +66,8 @@ app.post("/signup", (req, res) => {
       set(ref(database, 'users/' + user.uid), {
         username: body.username,
         email: body.email,
+        dateOfBirth: body.dateOfBirth,
+        gender: body.gender,
         spotifyLinked: false
       }).then(() => {
         return res.send("User creation successful");
@@ -76,7 +82,6 @@ app.post("/signup", (req, res) => {
       return res.status(500).send("User authentication creation failure");
     });
 });
-app.use(express.json());
 
 let spoonacularUrl = env["spoonacular_url"];
 let spoonacularApi = env["spoonacular_key"];
