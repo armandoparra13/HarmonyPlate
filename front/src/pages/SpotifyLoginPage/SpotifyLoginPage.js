@@ -1,0 +1,15 @@
+import React, { useEffect } from 'react';
+import './SpotifyLoginPage.css';
+
+const SpotifyLogin = () => {
+
+  
+  return (
+    <div>
+      <h3>Login with Spotify to match with people with similar music preferences! </h3>
+      <a href="/auth/spotify" className="spotify-button">LOGIN WITH SPOTIFY</a>
+    </div>
+  );
+};
+
+export default SpotifyLogin;
