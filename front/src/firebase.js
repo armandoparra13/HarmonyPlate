@@ -2,7 +2,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 
-let env = require('./env.json');
+let env = require('./env_frontend.json');
 let api_key = env['fbKey'];
 let domain = env['fbauthDomain'];
 let db_url = env['fbdatabaseURL'];
