@@ -1,10 +1,21 @@
-## Available Scripts
+## Installation
+
+1. Clone the repository:
+### `git clone https://github.com/armandoparra13/HarmonyPlate.git`
+
+2. Cd into project directory:
+### `cd HarmonyPlate`
 
 In the project directory, you can run:
 
 ### `npm run install:all`
 
 This will install all dependencies in the HarmonyPlate, front, and backend directories.
+
+## Configuration
+
+Our app requires environment variables, there are env_template.json files both in the front and backend directories.\
+You will need to copy the template and fill it with the necessary values. env_backend_template.json must go in ./backend/env_backend.json and env_frontend_template.json must go in ./front/src/env_frontend.json
 
 ### `npm run start`
 

@@ -1,13 +1,32 @@
 import express from 'express';
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, set } from "firebase/database";
-import firebaseConfig from './env_backend.json' assert { type: 'json' };
+import env from './env_backend.json' assert { type: 'json' };
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import axios from 'axios';
-import env from './env.json' assert {type: 'json'};
 
 const app = express();
 app.use(express.json());
+
+let api_key = env['apiKey'];
+let domain = env['authDomain'];
+let db_url = env['databaseURL'];
+let project_id = env['projectId'];
+let storage_bucket = env['storageBucket'];
+let mess_sender = env['messagingSenderId'];
+let app_id = env['appId'];
+let measure_id = env['measurementId'];
+
+const firebaseConfig = {
+  apiKey: api_key,
+  authDomain: domain,
+  databaseURL: db_url,
+  projectId: project_id,
+  storageBucket: storage_bucket,
+  messagingSenderId: mess_sender,
+  appId: app_id,
+  measurementId: measure_id,
+};
 
 // Initialize Firebase, Realtime Database, Authentication
 const firebaseApp = initializeApp(firebaseConfig);
