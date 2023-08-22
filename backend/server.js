@@ -4,7 +4,7 @@ import { getDatabase, ref, set } from "firebase/database";
 import firebaseConfig from './env_backend.json' assert { type: 'json' };
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import axios from 'axios';
-import env from './env.json' assert {type: 'json'}
+import env from './env.json' assert {type: 'json'};
 
 const app = express();
 app.use(express.json());
@@ -28,7 +28,7 @@ app.post("/signup", (req, res) => {
     !body.hasOwnProperty("password") ||
     body.username.trim() === "" ||
     body.email.trim() === "" ||
-    !body.password.trim() === ""
+    body.password.trim() === ""
   ) {
     return res.status(400).send("Invalid request.");
   }
@@ -57,7 +57,6 @@ app.post("/signup", (req, res) => {
       return res.status(500).send("User authentication creation failure");
     });
 });
-app.use(express.json());
 
 let spoonacularUrl = env["spoonacular_url"];
 let spoonacularApi = env["spoonacular_key"];

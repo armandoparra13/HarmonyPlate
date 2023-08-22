@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './SignUpPage.css';
+import axios from 'axios';
 
 const SignUp = () => {
     const [formData, setFormData] = useState({
@@ -19,9 +20,22 @@ const SignUp = () => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit =  async (e) => {
         e.preventDefault();
-        // TODO: Add form submission logic here
+
+        const dataToSend = {
+            username: formData.name,
+            email: formData.email,
+            password: formData.password
+        };
+
+        try {
+            const response = await axios.post('/signup', dataToSend);
+
+            console.log(response.data);
+        } catch (error) {
+            console.error('Error submitting form:', error);
+        }
         console.log(formData);
     };
 
