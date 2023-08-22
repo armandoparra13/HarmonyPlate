@@ -1,0 +1,16 @@
+{
+    "apiKey": "",
+    "authDomain": "",
+    "projectId": "",
+    "storageBucket": "",
+    "messagingSenderId": "",
+    "appId": "",
+    "measurementId": "",
+    "databaseURL": "https://harmonyplate-68e8b-default-rtdb.firebaseio.com",
+
+    "spotifyClientID": "",
+    "spotifyClientSecret": "",
+    "spotifyRedirectURI": "https://localhost:3000/spotify-success",
+    "spoonacular_url": "https://api.spoonacular.com/",
+    "spoonacular_key": ""
+}
