@@ -4,6 +4,7 @@ import './SignUpPage.css';
 const SignUp = () => {
     const [formData, setFormData] = useState({
         name: '',
+        email: '',
         dob: '',
         password: '',
         confirmPassword: '',
@@ -31,6 +32,10 @@ const SignUp = () => {
                 <div className="input-group">
                     <label htmlFor="name">Name:</label>
                     <input className="custom-input" id="name" name="name" required onChange={handleChange} value={formData.name} />
+                </div>
+                <div className="input-group">
+                    <label htmlFor="email">Email:</label>
+                    <input type="email" id="email" name="email" required onChange={handleChange} value={formData.email} />
                 </div>
                 <div className="input-group">
                     <label htmlFor="dob">Date of Birth:</label>
