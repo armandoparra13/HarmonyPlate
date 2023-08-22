@@ -53,7 +53,7 @@ const SignUp = () => {
                     </select>
                 </div>
                 <div className="input-group">
-                    <button type="submit">Sign Up</button>
+                    <button className="input-group-button" type="submit">Sign Up</button>
                 </div>
             </form>
         </div>

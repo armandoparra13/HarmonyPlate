@@ -1,0 +1,20 @@
+.submit {
+    width: 100px;
+    padding: 10px;
+    background-color: #F28482;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.diet, .cuisine {
+    width: 400px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.selected-option {
+    background-color: #F28482;
+  }
