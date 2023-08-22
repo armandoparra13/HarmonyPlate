@@ -26,7 +26,9 @@ const SignUp = () => {
         const dataToSend = {
             username: formData.name,
             email: formData.email,
-            password: formData.password
+            password: formData.password,
+            dateOfBirth: formData.dob,
+            gender: formData.gender
         };
 
         try {
