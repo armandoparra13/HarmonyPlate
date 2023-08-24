@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useAuth } from '../../contexts/Auth'
+import { useNavigate } from 'react-router-dom';
 
 /*
 export const LoginPage = () => {
@@ -12,7 +14,27 @@ export const LoginPage = () => {
 */
 
 function CreateProfilePage() {
-  return <div>hi- add profile frontend</div>;
+  const { logout } = useAuth()
+  const navigate = useNavigate();
+
+  async function handleLogout() {
+
+    try {
+      await logout();
+      navigate('/');
+    } catch {
+
+    }
+
+  }
+
+  return (
+    <div>
+      <div>hi- add profile frontend</div>
+      <div>
+        <button onClick={handleLogout}>Log out</button>
+      </div>
+    </div>);
 }
 
 export default CreateProfilePage;

@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './LoginPage.css';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../firebase';
-import { NavLink, useNavigate } from 'react-router-dom';
+//import { signInWithEmailAndPassword } from 'firebase/auth';
+//import { auth } from '../../firebase';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/Auth'
 
 function LoginPage() {
   const [loginFormActive, setLoginFormActive] = useState(false);
+  const { login } = useAuth();
 
   const toggleLoginForm = () => {
     setLoginFormActive(true);
@@ -19,19 +21,26 @@ function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const onLogin = (e) => {
+  const onLogin = async (e) => {
     e.preventDefault();
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        navigate('/create-profile');
-        console.log(user);
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorCode, errorMessage);
-      });
+    // signInWithEmailAndPassword(auth, email, password)
+    //   .then((userCredential) => {
+    //     const user = userCredential.user;
+    //     navigate('/create-profile');
+    //     console.log(user);
+    //   })
+    //   .catch((error) => {
+    //     const errorCode = error.code;
+    //     const errorMessage = error.message;
+    //     console.log(errorCode, errorMessage);
+    //   });
+    try {
+      await login(email, password);
+      console.log("worked");
+      navigate('/create-profile');
+    } catch (error) {
+      console.log('Error logging in:', error)
+    }
   };
 
   const onSignUp = () => {
@@ -40,7 +49,7 @@ function LoginPage() {
 
   return (
     <div>
-      <img src="https://media.giphy.com/media/h7uTwqEHysbd2lhyDP/giphy.gif" />
+      <img className="bg-img" src="https://media.giphy.com/media/h7uTwqEHysbd2lhyDP/giphy.gif" />
 
       <div className="card">
         <div className="title">Harmony Plate</div>
@@ -82,9 +91,9 @@ function LoginPage() {
             Login
           </button>
         </div>
-        <p className="text-sm text-white text-center">
-          No account yet? <NavLink to="/signup">Sign up</NavLink>
-        </p>
+        {loginFormActive && (<p className="text-sm text-white text-center">
+          No account yet? <Link to="/signup">Sign up</Link>
+        </p>)}
       </div>
     </div>
   );

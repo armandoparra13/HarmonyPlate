@@ -18,3 +18,40 @@
 .selected-option {
     background-color: #F28482;
   }
+
+.custom-input, .custom-select {
+    width: 500px;
+    padding: 10px; /* Increased padding for better appearance */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group-button {
+    width: 300px;
+    padding: 10px;
+    background-color: #F28482; /* Updated color */
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.food-img {
+    width: 80%;
+}
+
+.food-page {
+    padding: 50px;
+}
+
+.options {
+    padding: 20px;
+}
+
+.option {
+    padding: 10x;
+}
