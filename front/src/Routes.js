@@ -11,7 +11,8 @@ import SpotifySuccessPage from './pages/SpotifyLoginPage/SpotifySuccessPage';
 import UploadPictures from './pages/ProfileCreationPage/UploadPictures';
 
 export const AppRoutes = () => {
-/*
+
+  /*
     const [token, setToken] = useState('');
 
     useEffect(() => {
