@@ -49,7 +49,7 @@ function LoginPage() {
 
   return (
     <div>
-      <img src="https://media.giphy.com/media/h7uTwqEHysbd2lhyDP/giphy.gif" />
+      <img className="bg-img" src="https://media.giphy.com/media/h7uTwqEHysbd2lhyDP/giphy.gif" />
 
       <div className="card">
         <div className="title">Harmony Plate</div>
