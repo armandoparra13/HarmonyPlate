@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-function SpotifySuccessPage({token}) {
+function SpotifySuccessPage({}) {
   //const navigate = useNavigate();
   //const accessToken = useAuth(code);
   //console.log(token);
