@@ -67,7 +67,7 @@ const SignUp = () => {
                 </div>
                 <div className="input-group">
                     <label htmlFor="gender">Gender:</label>
-                    <select id="gender" name="gender" onChange={handleChange} value={formData.gender}>
+                    <select className="custom-select" id="gender" name="gender" onChange={handleChange} value={formData.gender}>
                         <option value="male">Male</option>
                         <option value="female">Female</option>
                         <option value="nonbinary">Nonbinary</option>

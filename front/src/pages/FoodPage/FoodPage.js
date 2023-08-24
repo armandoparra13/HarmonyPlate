@@ -59,10 +59,11 @@ function FoodPage() {
     }
 
     return (
-        <div>
-            <div>
+        <div className="food-page">
+            <div className="input-group">
                 <label>Keyword:</label>
                 <input
+                    className="custom-input"
                     id="keyword"
                     type="text"
                     name="keyword"
@@ -71,10 +72,10 @@ function FoodPage() {
                     )}
                 />
             </div>
-            <div>
+            <div className="input-group">
                 <label>Cuisine:</label>
                 <select
-                    class="cuisine"
+                    className="custom-select"
                     name="cuisine"
                     onClick={(e) => (
                         setCuisine(e.target.value)
@@ -110,10 +111,10 @@ function FoodPage() {
                     <option value="vietnamese">Vietnamese</option>
                 </select>
             </div>
-            <div>
+            <div className="input-group">
                 <label>Diet:</label>
                 <select
-                    class="diet"
+                    className="custom-select"
                     name="diet"
                     onClick={(e) => (
                         setDiet(e.target.value))}
@@ -132,21 +133,24 @@ function FoodPage() {
                     <option value="whole30">Whole30</option>
                 </select>
             </div>
-            <button class="submit" onClick={onSubmit}>Search</button>
-            <div class="options">
+            <button className="input-group-button" onClick={onSubmit}>Search</button>
+            <div className="options">
                 {!validSearch ? (
                     <div>{errorMessage}</div>
                 ) : options.length === 0 ? (<div>No options found. Change choices or finish.</div>) : (
                     <>
                         <div>Which one sounds the best to you</div>
                         {options.map((data, i) => (
-                            <button className="option" id={data.id} key={i} name={data.title} onClick={onChoose}>{data.title}</button>
+                            <button className="option" id={data.id} key={i} name={data.title} onClick={onChoose}>
+                                <div>{data.title}</div>
+                                <img className="food-img" src={data.image}></img>
+                            </button>
                         ))}
                     </>
                 )}
             </div>
 
-            {validSearch && <button class="submit" onClick={submitChoice}>Finish</button>}
+            {validSearch && <button className="input-group-button" onClick={submitChoice}>Finish</button>}
         </div >
     );
 }
