@@ -19,7 +19,7 @@
     background-color: #F28482;
   }
 
-.custom-input, .custom-select {
+.custom-food-input, .custom-food-select {
     width: 500px;
     padding: 10px; /* Increased padding for better appearance */
     border: 1px solid #ccc;

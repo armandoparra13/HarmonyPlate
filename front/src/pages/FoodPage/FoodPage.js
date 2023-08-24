@@ -66,9 +66,9 @@ function FoodPage() {
     return (
         <div className="food-page">
             <div className="input-group">
-                <label>Keyword:</label>
+                <label>Type in a food:</label>
                 <input
-                    className="custom-input"
+                    className="custom-food-input"
                     id="keyword"
                     type="text"
                     name="keyword"
@@ -78,9 +78,9 @@ function FoodPage() {
                 />
             </div>
             <div className="input-group">
-                <label>Cuisine:</label>
+                <label>Choose a cuisine:</label>
                 <select
-                    className="custom-select"
+                    className="custom-food-select"
                     name="cuisine"
                     onClick={(e) => (
                         setCuisine(e.target.value)
@@ -117,7 +117,7 @@ function FoodPage() {
                 </select>
             </div>
             <div className="input-group">
-                <label>Diet:</label>
+                <label>Choose a diet (or you can leave it blank):</label>
                 <select
                     className="custom-select"
                     name="diet"
@@ -148,7 +148,7 @@ function FoodPage() {
                         {options.map((data, i) => (
                             <button className="option" id={data.id} key={i} name={data.title} onClick={onChoose}>
                                 <div>{data.title}</div>
-                                <img className="food-img" src={data.image}></img>
+                                <img className="food-img" src={data.image} alt=""></img>
                             </button>
                         ))}
                     </>
