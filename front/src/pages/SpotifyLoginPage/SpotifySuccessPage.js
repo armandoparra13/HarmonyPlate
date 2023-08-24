@@ -22,4 +22,3 @@ function SpotifySuccessPage({}) {
 }
 
 export default SpotifySuccessPage;
-
