@@ -29,7 +29,6 @@ function FoodPage() {
                     setValidSearch(true);
                     setErrorMessage('');
                     setOptions(data.options);
-                    console.log(options);
                 }
             })
             .catch((error) => {
@@ -39,15 +38,13 @@ function FoodPage() {
 
     const onChoose = (e) => {
         const previouslySelected = document.querySelector('.selected-option');
+        console.log(e)
         if (previouslySelected) {
             previouslySelected.classList.remove('selected-option');
         }
-        e.target.classList.add('selected-option');
+        e.currentTarget.classList.add('selected-option');
         setOptionChosen(e.target.id);
-
     }
-
-    console.log(currentUser.accessToken)
 
     const submitChoice = (e) => {
         if (options.length === 0 || optionChosen) {
@@ -66,9 +63,9 @@ function FoodPage() {
     return (
         <div className="food-page">
             <div className="input-group">
-                <label>Keyword:</label>
+                <label>Type in a food:</label>
                 <input
-                    className="custom-input"
+                    className="custom-food-input"
                     id="keyword"
                     type="text"
                     name="keyword"
@@ -78,9 +75,9 @@ function FoodPage() {
                 />
             </div>
             <div className="input-group">
-                <label>Cuisine:</label>
+                <label>Choose a cuisine:</label>
                 <select
-                    className="custom-select"
+                    className="custom-food-select"
                     name="cuisine"
                     onClick={(e) => (
                         setCuisine(e.target.value)
@@ -117,7 +114,7 @@ function FoodPage() {
                 </select>
             </div>
             <div className="input-group">
-                <label>Diet:</label>
+                <label>Choose a diet (or you can leave it blank):</label>
                 <select
                     className="custom-select"
                     name="diet"
@@ -148,7 +145,7 @@ function FoodPage() {
                         {options.map((data, i) => (
                             <button className="option" id={data.id} key={i} name={data.title} onClick={onChoose}>
                                 <div>{data.title}</div>
-                                <img className="food-img" src={data.image}></img>
+                                <img className="food-img" src={data.image} alt=""></img>
                             </button>
                         ))}
                     </>
