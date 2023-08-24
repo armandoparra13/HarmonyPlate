@@ -29,7 +29,6 @@ function FoodPage() {
                     setValidSearch(true);
                     setErrorMessage('');
                     setOptions(data.options);
-                    console.log(options);
                 }
             })
             .catch((error) => {
@@ -39,15 +38,13 @@ function FoodPage() {
 
     const onChoose = (e) => {
         const previouslySelected = document.querySelector('.selected-option');
+        console.log(e)
         if (previouslySelected) {
             previouslySelected.classList.remove('selected-option');
         }
-        e.target.classList.add('selected-option');
+        e.currentTarget.classList.add('selected-option');
         setOptionChosen(e.target.id);
-
     }
-
-    console.log(currentUser.accessToken)
 
     const submitChoice = (e) => {
         if (options.length === 0 || optionChosen) {
