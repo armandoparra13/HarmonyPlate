@@ -1,9 +1,11 @@
 import express from 'express';
 import { initializeApp } from 'firebase/app';
-import { getDatabase, ref, set } from "firebase/database";
+import { getDatabase, ref, set, update } from "firebase/database";
 import env from './env_backend.json' assert { type: 'json' };
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import axios from 'axios';
+import admin from 'firebase-admin';
+import serviceAccount from "./serviceAccount.json" assert { type: 'json' };
 
 const app = express();
 app.use(express.json());
@@ -35,6 +37,11 @@ const auth = getAuth();
 
 const port = 5000;
 const hostname = "localhost";
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://harmonyplate-68e8b-default-rtdb.firebaseio.com"
+});
 
 app.post("/signup", (req, res) => {
   // verify input is valid
@@ -68,7 +75,8 @@ app.post("/signup", (req, res) => {
         email: body.email,
         dateOfBirth: body.dateOfBirth,
         gender: body.gender,
-        spotifyLinked: false
+        spotifyLinked: false,
+        foodsChosen: false
       }).then(() => {
         return res.send("User creation successful");
       }).catch(() => {
@@ -115,7 +123,7 @@ app.get("/search", (req, res) => {
   })
 })
 
-app.post("/foodChoice", (req, res) => {
+app.post("/foodChoice", async (req, res) => {
   // verify input is valid
   let body = req.body;
 
@@ -127,17 +135,21 @@ app.post("/foodChoice", (req, res) => {
   }
 
   console.log(body.chosenFood)
-  /*let user = userCredential.user;
-  set(ref(database, 'users/' + user.uid), {
-    username: body.username,
-    email: body.email,
-    spotifyLinked: false
-  }).then(() => {
-    return res.send("User creation successful");
-  }).catch(() => {
-    console.log("Adding user to Database failure");
-    return res.status(500).send("Adding user to Database failure");
-  })*/
+  admin.auth()
+    .verifyIdToken(req.headers.authorization)
+    .then(decodedToken => {
+      update(ref(database, 'users/' + decodedToken.uid), {
+        food: { favoriteFood: body.chosenFood }
+      }).catch(() => {
+        console.log("Adding Favorite Food failed");
+        return res.status(500).send("Adding Favorite Food failure");
+      })
+
+    })
+    .catch(error => {
+      throw new Error('Error while verifying token:', error)
+    })
+
 })
 
 app.get("/recipe/:id", (req, res) => {
