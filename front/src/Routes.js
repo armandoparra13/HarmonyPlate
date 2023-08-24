@@ -11,7 +11,7 @@ import SpotifySuccessPage from './pages/SpotifyLoginPage/SpotifySuccessPage';
 import UploadPictures from './pages/ProfileCreationPage/UploadPictures';
 
 export const AppRoutes = () => {
-
+/*
     const [token, setToken] = useState('');
 
     useEffect(() => {
@@ -26,6 +26,7 @@ export const AppRoutes = () => {
     getToken();
 
   }, []);
+  */
 
   return (
     <div>
@@ -35,14 +36,10 @@ export const AppRoutes = () => {
         <Route path="/" element={<LoginPage />} />
         
         <Route path="/spotify-login" element={<SpotifyLoginPage />} />
-        <Route path="/spotify-success" element={<SpotifySuccessPage token={token}/>}/>
+        <Route path="/spotify-success" element={<SpotifySuccessPage />}/>
         <Route path="/upload-pictures" element={<UploadPictures />} />
-        { (token === '') ? (
-             <Route path="/spotify-login" element={<SpotifyLoginPage />} />
-         ) : (
-            <Route path="/matching" element={<MatchingPage />} />
-            
-        )}
+    
+        <Route path="/matching" element={<MatchingPage />} />
         <Route path="/create-profile" element={<CreateProfilePage />} />
         <Route path="/SignUp" element={<SignUp />} />
         <Route path="/food" element={<FoodPage />} />
