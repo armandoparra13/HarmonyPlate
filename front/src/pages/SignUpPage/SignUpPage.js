@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './SignUpPage.css';
 import axios from 'axios';
+import { useAuth } from '../../contexts/Auth'
+import { useNavigate } from 'react-router-dom';
 
 const SignUp = () => {
     const [formData, setFormData] = useState({
@@ -11,6 +13,8 @@ const SignUp = () => {
         confirmPassword: '',
         gender: 'male'
     });
+    const navigate = useNavigate();
+    const { login } = useAuth()
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -20,7 +24,7 @@ const SignUp = () => {
         }));
     };
 
-    const handleSubmit =  async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         const dataToSend = {
@@ -35,10 +39,15 @@ const SignUp = () => {
             const response = await axios.post('/signup', dataToSend);
 
             console.log(response.data);
+            try {
+                await login(formData.email, formData.password);
+                navigate('/food')
+            } catch (error) {
+                console.log('Error logging in:', error)
+            }
         } catch (error) {
             console.error('Error submitting form:', error);
         }
-        console.log(formData);
     };
 
     return (

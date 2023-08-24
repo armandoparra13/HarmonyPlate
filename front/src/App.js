@@ -1,10 +1,13 @@
-import {AppRoutes} from './Routes';
-import './App.css';
+import { AppRoutes } from './Routes';
+import { Auth } from './contexts/Auth';
 
 function App() {
   return (
-    <AppRoutes/>
+    <Auth>
+      <AppRoutes />
+    </Auth>
   );
 }
 
 export default App;
+

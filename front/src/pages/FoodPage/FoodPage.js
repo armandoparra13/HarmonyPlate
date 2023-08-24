@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import "./FoodPage.css"
+import { useAuth } from '../../contexts/Auth';
+import axios from 'axios';
 
 function FoodPage() {
+    const { currentUser } = useAuth();
     const [keyword, setKeyword] = useState('');
     const [cuisine, setCuisine] = useState('');
     const [diet, setDiet] = useState('');
@@ -44,15 +47,17 @@ function FoodPage() {
 
     }
 
+    console.log(currentUser.accessToken)
+
     const submitChoice = (e) => {
         if (options.length === 0 || optionChosen) {
             console.log(optionChosen);
-            fetch('/foodChoice',
+            axios.post('/foodChoice',
+                { chosenFood: optionChosen },
                 {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chosenFood: optionChosen })
-
+                    headers: {
+                        authorization: currentUser.accessToken,
+                    },
                 })
         }
 
