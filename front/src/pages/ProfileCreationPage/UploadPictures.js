@@ -33,6 +33,10 @@ function UploadPictures() {
           console.error(error);
         }
       };
+      const handleNextClick = () => {
+        // Navigate to a different page 
+        //navigate("/");
+      };
 
     return (
       <div>
@@ -40,6 +44,7 @@ function UploadPictures() {
         <input type="file" accept="image/*" onChange={handleImageChange} />
         <button onClick={handleImageUpload}>Upload Image</button>
         <p>Please upload at least 2 pictures to continue.</p>
+        <button onClick={handleNextClick}>Next</button>
       </div>
     );
   }
