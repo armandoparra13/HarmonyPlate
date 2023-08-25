@@ -17,7 +17,7 @@ function FoodPage() {
         e.preventDefault();
         setOptionChosen([]);
 
-        fetch(`/search?query=${keyword}&cuisine=${cuisine}&diet=${diet}`)
+        fetch(`/auth/search?query=${keyword}&cuisine=${cuisine}&diet=${diet}`)
             .then((response) => {
                 return response.json();
             })
@@ -49,7 +49,7 @@ function FoodPage() {
     const submitChoice = (e) => {
         if (options.length === 0 || optionChosen) {
             console.log(optionChosen);
-            axios.post('/foodChoice',
+            axios.post('/auth/foodChoice',
                 { chosenFood: optionChosen },
                 {
                     headers: {

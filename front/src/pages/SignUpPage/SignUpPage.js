@@ -36,7 +36,7 @@ const SignUp = () => {
         };
 
         try {
-            const response = await axios.post('/signup', dataToSend);
+            const response = await axios.post('/auth/signup', dataToSend);
 
             console.log(response.data);
             try {
