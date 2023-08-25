@@ -11,12 +11,14 @@ import request from 'request';
 import path from 'path';
 import multer from 'multer';
 import fs from 'fs';
+import bodyParser from 'body-parser';
 
 
 
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.use(bodyParser.json());
 
 let api_key = env['apiKey'];
 let domain = env['authDomain'];
@@ -261,9 +263,6 @@ app.get("/auth/search", (req, res) => {
 app.post("/auth/foodChoice", async (req, res) => {
   // verify input is valid
   let body = req.body;
-  if (typeof chosenFood === 'string') {
-    console.log("string");
-  }
 
   if (
     !body.hasOwnProperty("chosenFood") ||
@@ -298,16 +297,27 @@ app.get("/auth/recipe/:id", (req, res) => {
   })
 })
 
-const verifyTokenMiddleware = async (req, res, next) => {
-  try {
-      const token = req.headers.authorization?.split(' ')[1];
-      const decodedToken = await admin.auth().verifyIdToken(token);
-      req.user = decodedToken; // Attach decoded user info to the request
-      next();
-  } catch (error) {
-      res.status(401).json({ error: 'Unauthorized' });
-  }
-};
+//description
+
+app.post('/auth/submit-desc', async (req, res) => {
+  let body = req.body;
+  console.log(req.headers.authorization);
+  console.log(body.desc);
+  admin.auth()
+    .verifyIdToken(req.headers.authorization)
+    .then(decodedToken => {
+      update(ref(database, 'users/' + decodedToken.uid), {
+        description: body.desc 
+      }).catch(() => {
+        console.log("Adding desc failed");
+        return res.status(500).send("Adding desc failure");
+      })
+
+    })
+    .catch(error => {
+      throw new Error('Error while verifying token:', error)
+    })
+});
 
 const pictureCounters = {};
 
