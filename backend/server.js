@@ -320,10 +320,8 @@ const storage = multer.diskStorage({
         
         const userID = decodedToken.uid; // Assuming 'uid' is the user ID field in the decoded token
 
-        const userSnapshot = await admin.database().ref('users/' + userID).once('value');
-            const username = userSnapshot.val().username; // Assuming 'username' is the field containing the username
-            
-        const userFolderPath = path.join('../front/public/uploads', username);
+        
+        const userFolderPath = path.join('../front/public/uploads', userID);
         fs.mkdirSync(userFolderPath, { recursive: true });
 
         // Attach the decoded token to the request for later use (optional)
@@ -340,17 +338,19 @@ const storage = multer.diskStorage({
       const token = req.headers.authorization?.split(' ')[1];
       const decodedToken = await admin.auth().verifyIdToken(token);
       const userID = decodedToken.uid; // Assuming 'uid' is the user ID field in the decoded token
+      console.log(userID);
+      console.log(token);
 
       // Retrieve the username from the database based on the userID
       const userSnapshot = await admin.database().ref('users/' + userID).once('value');
-      const username = userSnapshot.val().username; // Assuming 'username' is the field containing the username
+      const email = userSnapshot.val().email; // Assuming 'username' is the field containing the username
 
-      const pictureNumber = pictureCounters[username] || 0; // Get the picture number for the user
+      const pictureNumber = pictureCounters[userID] || 0; // Get the picture number for the user
 
       // Increment the picture counter for the user
-      pictureCounters[username] = pictureNumber + 1;
+      pictureCounters[userID] = pictureNumber + 1;
 
-      const uniqueFilename = `${username}_${pictureNumber}${fileExtension}`;
+      const uniqueFilename = `${userID}_${pictureNumber}${fileExtension}`;
 
       cb(null, uniqueFilename);
   } catch (error) {
