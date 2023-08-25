@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
+import { useAuth } from '../../contexts/Auth';
 
 function UploadPictures() {
+  const { currentUser } = useAuth();
     const [selectedImage, setSelectedImage] = useState(null);
     //const [images, setImages] = useState(Array(6).fill(null));
   
@@ -10,6 +12,11 @@ function UploadPictures() {
     };
 
     const handleImageUpload = async () => {
+ 
+
+    if (!selectedImage || !currentUser) {
+      return;
+    }
         const formData = new FormData();
         formData.append('image', selectedImage);
     
@@ -17,6 +24,7 @@ function UploadPictures() {
           const response = await axios.post('/auth/upload', formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
+              Authorization: `Bearer ${currentUser.accessToken}`,
             },
           });
     

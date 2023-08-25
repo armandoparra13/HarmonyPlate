@@ -9,7 +9,9 @@ import serviceAccount from "./serviceAccount.json" assert { type: 'json' };
 import cors from 'cors';
 import request from 'request';
 import path from 'path';
-import { access } from 'fs';
+import multer from 'multer';
+import fs from 'fs';
+
 
 
 const app = express();
@@ -270,7 +272,6 @@ app.post("/auth/foodChoice", async (req, res) => {
     return res.status(400).send("Invalid request.");
   }
 
-  console.log('yuh');
   console.log(body.chosenFood)
   admin.auth()
     .verifyIdToken(req.headers.authorization)
@@ -296,6 +297,79 @@ app.get("/auth/recipe/:id", (req, res) => {
     res.status(200).send(response.data);
   })
 })
+
+const verifyTokenMiddleware = async (req, res, next) => {
+  try {
+      const token = req.headers.authorization?.split(' ')[1];
+      const decodedToken = await admin.auth().verifyIdToken(token);
+      req.user = decodedToken; // Attach decoded user info to the request
+      next();
+  } catch (error) {
+      res.status(401).json({ error: 'Unauthorized' });
+  }
+};
+
+const pictureCounters = {};
+
+//UPLOAD PICTURES
+const storage = multer.diskStorage({
+  destination: async (req, file, cb) => {
+    try {
+        const token = req.headers.authorization?.split(' ')[1];
+        const decodedToken = await admin.auth().verifyIdToken(token);
+        
+        const userID = decodedToken.uid; // Assuming 'uid' is the user ID field in the decoded token
+
+        const userSnapshot = await admin.database().ref('users/' + userID).once('value');
+            const username = userSnapshot.val().username; // Assuming 'username' is the field containing the username
+            
+        const userFolderPath = path.join('../front/public/uploads', username);
+        fs.mkdirSync(userFolderPath, { recursive: true });
+
+        // Attach the decoded token to the request for later use (optional)
+        req.decodedToken = decodedToken;
+
+        cb(null, userFolderPath);
+    } catch (error) {
+        cb(error);
+    }
+},
+  filename: async (req, file, cb) => {
+    try {
+      const fileExtension = path.extname(file.originalname);
+      const token = req.headers.authorization?.split(' ')[1];
+      const decodedToken = await admin.auth().verifyIdToken(token);
+      const userID = decodedToken.uid; // Assuming 'uid' is the user ID field in the decoded token
+
+      // Retrieve the username from the database based on the userID
+      const userSnapshot = await admin.database().ref('users/' + userID).once('value');
+      const username = userSnapshot.val().username; // Assuming 'username' is the field containing the username
+
+      const pictureNumber = pictureCounters[username] || 0; // Get the picture number for the user
+
+      // Increment the picture counter for the user
+      pictureCounters[username] = pictureNumber + 1;
+
+      const uniqueFilename = `${username}_${pictureNumber}${fileExtension}`;
+
+      cb(null, uniqueFilename);
+  } catch (error) {
+      cb(error);
+  }
+   
+  }
+});
+
+const upload = multer({ storage });
+
+// Route to handle image upload
+app.post('/auth/upload', upload.single('image'), (req, res) => {
+  if (req.file) {
+      res.json({ imageUrl: '/uploads/${req.file.filename}' });
+  } else {
+      res.status(400).json({ message: 'No file uploaded' });
+  }
+});
 
 app.listen(port, hostname, () => {
   console.log(`http://${hostname}:${port}`);
