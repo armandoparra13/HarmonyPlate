@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import { useAuth } from '../../contexts/Auth';
+import { useNavigate } from 'react-router-dom';
 
 function UploadPictures() {
   const { currentUser } = useAuth();
     const [selectedImage, setSelectedImage] = useState(null);
+    const navigate = useNavigate();
     //const [images, setImages] = useState(Array(6).fill(null));
   
     const handleImageChange = (event) => {
@@ -17,25 +19,25 @@ function UploadPictures() {
     if (!selectedImage || !currentUser) {
       return;
     }
-        const formData = new FormData();
-        formData.append('image', selectedImage);
+    const formData = new FormData();
+    formData.append('image', selectedImage);
     
-        try {
-          const response = await axios.post('/auth/upload', formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-              Authorization: `Bearer ${currentUser.accessToken}`,
-            },
-          });
+    try {
+      const response = await axios.post('/auth/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${currentUser.accessToken}`,
+        },
+      });
     
-          console.log(response.data);
-        } catch (error) {
-          console.error(error);
-        }
-      };
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
       const handleNextClick = () => {
         // Navigate to a different page 
-        //navigate("/");
+        navigate("/spotify-login");
       };
 
     return (
