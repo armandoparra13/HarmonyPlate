@@ -259,6 +259,9 @@ app.get("/auth/search", (req, res) => {
 app.post("/auth/foodChoice", async (req, res) => {
   // verify input is valid
   let body = req.body;
+  if (typeof chosenFood === 'string') {
+    console.log("string");
+  }
 
   if (
     !body.hasOwnProperty("chosenFood") ||
@@ -267,6 +270,7 @@ app.post("/auth/foodChoice", async (req, res) => {
     return res.status(400).send("Invalid request.");
   }
 
+  console.log('yuh');
   console.log(body.chosenFood)
   admin.auth()
     .verifyIdToken(req.headers.authorization)
