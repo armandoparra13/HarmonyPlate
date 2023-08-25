@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 function SpotifySuccessPage({}) {
-  //const navigate = useNavigate();
+  const navigate = useNavigate();
   //const accessToken = useAuth(code);
   //console.log(token);
 
   const handleNextClick = () => {
     // Navigate to a different page 
-    //navigate("/");
+    navigate("/food");
   };
 
   return (
