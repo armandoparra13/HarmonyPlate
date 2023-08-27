@@ -66,11 +66,12 @@ export const AppRoutes = () => {
               <Route path="/upload-pictures" element={<UploadPictures />} />
               <Route path="/spotify-login" element={<SpotifyLoginPage />} />
               <Route path="/food" element={<FoodPage />} />
+              <Route path="/create-profile" element={<CreateProfilePage />} />
               <Route
                 path="/SignUp"
                 element={
                   spotifyLinked && picturesUploaded && foodChosen ? (
-                    <Navigate to="/matching" />
+                    <Navigate to="/create-profile" />
                   ) : (
                     <>
                       {!picturesUploaded && <Navigate to="/upload-pictures" />}
