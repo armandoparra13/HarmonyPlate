@@ -3,7 +3,7 @@ import './LoginPage.css';
 //import { signInWithEmailAndPassword } from 'firebase/auth';
 //import { auth } from '../../firebase';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/Auth'
+import { useAuth } from '../../Auth'
 
 function LoginPage() {
   const [loginFormActive, setLoginFormActive] = useState(false);

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './SignUpPage.css';
 import axios from 'axios';
-import { useAuth } from '../../contexts/Auth'
+import { useAuth } from '../../Auth'
 import { useNavigate } from 'react-router-dom';
 
 const SignUp = () => {
@@ -41,7 +41,7 @@ const SignUp = () => {
             console.log(response.data);
             try {
                 await login(formData.email, formData.password);
-                navigate('/upload-pictures')
+                navigate('/upload-pictures');
             } catch (error) {
                 console.log('Error logging in:', error)
             }
@@ -49,6 +49,8 @@ const SignUp = () => {
             console.error('Error submitting form:', error);
         }
     };
+
+   
 
     return (
         <div className="container">

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import "./FoodPage.css"
-import { useAuth } from '../../contexts/Auth';
+import { useAuth } from '../../Auth';
 import axios from 'axios';
 
 function FoodPage() {

@@ -1,6 +1,6 @@
 import express from 'express';
 import { initializeApp } from 'firebase/app';
-import { getDatabase, ref, set, update } from "firebase/database";
+import { getDatabase, ref, set, update, get } from "firebase/database";
 import env from './env_backend.json' assert { type: 'json' };
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import axios from 'axios';
@@ -12,6 +12,7 @@ import path from 'path';
 import multer from 'multer';
 import fs from 'fs';
 import bodyParser from 'body-parser';
+import { decode } from 'punycode';
 
 
 
@@ -86,8 +87,10 @@ app.post("/auth/signup", (req, res) => {
         email: body.email,
         dateOfBirth: body.dateOfBirth,
         gender: body.gender,
+        picturesUploaded: false,
         spotifyLinked: false,
         foodsChosen: false
+        
       }).then(() => {
         return res.send("User creation successful");
       }).catch(() => {
@@ -371,8 +374,66 @@ const upload = multer({ storage });
 app.post('/auth/upload', upload.single('image'), (req, res) => {
   if (req.file) {
       res.json({ imageUrl: '/uploads/${req.file.filename}' });
+      const idToken = req.headers.authorization?.replace('Bearer ', '');
+      admin.auth()
+        .verifyIdToken(idToken)
+          .then(decodedToken => {
+              update(ref(database, 'users/' + decodedToken.uid), {
+                picturesUploaded: true
+  
+              }).catch(() => {
+                
+                return res.status(500).send("Adding picture failure");
+              })
+        
+            })
+            .catch(error => {
+              throw new Error('Error while verifying token:', error)
+            })
   } else {
       res.status(400).json({ message: 'No file uploaded' });
+  }
+});
+
+async function fetchUserData(req, res, next) {
+  const idToken = req.headers.authorization?.replace('Bearer ', '');
+
+  try {
+    if (idToken) {
+      const decodedToken = await admin.auth().verifyIdToken( idToken);
+      const uid = decodedToken.uid;
+      const userRef = admin.database().ref(`/users/${uid}`);
+      userRef.once('value', (snapshot) => {
+        const userData = snapshot.val();
+        if (userData) {
+          const spotifyLinked = userData.spotifyLinked || false;
+          const foodsChosen = userData.foodsChosen || false;
+          const picturesUploaded = userData.picturesUploaded || false;
+
+          req.userData = {
+            picturesUploaded,
+            spotifyLinked,
+            foodsChosen,
+          };
+          next();
+        
+        } else {
+          console.log('User data not found');
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Error verifying ID token:', error);
+  }
+
+ 
+}
+
+app.get('/auth/fetch-user-data', fetchUserData, (req, res) => {
+  if (req.userData) {
+    res.json(req.userData);
+  } else {
+    res.status(401).json({ error: 'Unauthorized' });
   }
 });
 

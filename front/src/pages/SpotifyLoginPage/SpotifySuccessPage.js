@@ -8,7 +8,7 @@ function SpotifySuccessPage({}) {
 
   const handleNextClick = () => {
     // Navigate to a different page 
-    navigate("/food");
+    navigate("/matching");
   };
 
   return (

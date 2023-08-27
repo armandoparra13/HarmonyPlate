@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
-import { useAuth } from '../../contexts/Auth';
+import { useAuth } from '../../Auth';
 import { useNavigate } from 'react-router-dom';
 
 function UploadPictures() {

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import './SpotifyLoginPage.css';
-import { useAuth } from '../../contexts/Auth';
+import { useAuth } from '../../Auth';
 
 const SpotifyLogin = () => {
     const { currentUser } = useAuth();
