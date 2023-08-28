@@ -110,22 +110,22 @@ let REDIRECT_URI = env["spotifyRedirectURI"];
 let CLIENT_SECRET = env["spotifyClientSecret"];
 
 var generateRandomString = function (length) {
-    var text = '';
-    var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  
-    for (var i = 0; i < length; i++) {
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
-  };
+  var text = '';
+  var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-app.get('/auth/spotify', function(req, res) {
+  for (var i = 0; i < length; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
+  return text;
+};
+
+app.get('/auth/spotify', function (req, res) {
   console.log('login');
   console.log(req.query.accessToken);
   var state = req.query.accessToken;
   var scope = 'user-read-private user-read-email user-top-read';
 
-  
+
   var auth_query_parameters = new URLSearchParams({
     response_type: "code",
     client_id: CLIENT_ID,
@@ -142,101 +142,97 @@ app.get('/auth/spotify', function(req, res) {
 });
 
 app.get('/auth/spotify-success', (req, res) => {
-  
-    var code = req.query.code;
-    console.log(code);
-    console.log("access", req.query.state);
-    let firebaseAccessToken = req.query.state;
-  
-    var authOptions = {
-      url: 'https://accounts.spotify.com/api/token',
-      form: {
-        code: code,
-        redirect_uri: REDIRECT_URI,
-        grant_type: 'authorization_code'
-      },
-      headers: {
-        'Authorization': 'Basic ' + (Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64')),
-        'Content-Type' : 'application/x-www-form-urlencoded'
-      },
-      json: true
-    };
-  
-    request.post(authOptions, function(error, response, body) {
-      //console.log(response.statusCode);
-      if (!error && response.statusCode === 200) {
-        //console.log(body.access_token);
-        let access_token = body.access_token;
 
-        axios.get('https://api.spotify.com/v1/me/top/artists?time_range=medium_term&limit=20', {
-            headers: {
-                Authorization: `Bearer ${access_token}`
-            }
-        }).then(response => {
-            const topArtists = response.data.items;
-            const artistNames = topArtists.map(artist => artist.name);
-            const artistGenres = topArtists.map(artist => artist.genres);
-            /*
-            topArtists.forEach(artist => {
-                const artistName = artist.name;
-                const artistGenres = artist.genres;
-                const artistPopularity = artist.popularity;
+  var code = req.query.code;
+  console.log(code);
+  console.log("access", req.query.state);
+  let firebaseAccessToken = req.query.state;
 
-                console.log(`Artist name: ${artistName}`);
-                console.log(`Genres: ${artistGenres.join(', ')}`);
-                
-            })
-            */
-            //res.send(`<pre>${JSON.stringify(response.data, null, 2)}</pre>`);
-            //console.log(response.data.name[0]);
-            admin.auth()
-            .verifyIdToken(firebaseAccessToken)
-            .then(decodedToken => {
-              update(ref(database, 'users/' + decodedToken.uid), {
-                spotify: { 
-                  artistNames: artistNames,
-                  artistGenres: artistGenres
-                },
-                spotifyLinked: true
-              }).then(() => {
-                res.redirect('/spotify-success');
-              }).catch(() => {
-                //console.log("Adding Spotify failed");
-                return res.status(500).send("Adding Spotify failure");
-              })
-        
-            })
-            .catch(error => {
-              throw new Error('Error while verifying token:', error)
-            })
-        
-        }).catch(error => {
-            res.send(error);
+  var authOptions = {
+    url: 'https://accounts.spotify.com/api/token',
+    form: {
+      code: code,
+      redirect_uri: REDIRECT_URI,
+      grant_type: 'authorization_code'
+    },
+    headers: {
+      'Authorization': 'Basic ' + (Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64')),
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    json: true
+  };
+
+  request.post(authOptions, function (error, response, body) {
+    //console.log(response.statusCode);
+    if (!error && response.statusCode === 200) {
+      //console.log(body.access_token);
+      let access_token = body.access_token;
+
+      axios.get('https://api.spotify.com/v1/me/top/artists?time_range=medium_term&limit=20', {
+        headers: {
+          Authorization: `Bearer ${access_token}`
+        }
+      }).then(response => {
+        const topArtists = response.data.items;
+        const artistNames = topArtists.map(artist => artist.name);
+        const artistGenres = topArtists.map(artist => artist.genres);
+        /*
+        topArtists.forEach(artist => {
+            const artistName = artist.name;
+            const artistGenres = artist.genres;
+            const artistPopularity = artist.popularity;
+
+            console.log(`Artist name: ${artistName}`);
+            console.log(`Genres: ${artistGenres.join(', ')}`);
+            
         })
-        //res.redirect('/spotify-success')
-      }
-    });
-  })
+        */
+        //res.send(`<pre>${JSON.stringify(response.data, null, 2)}</pre>`);
+        //console.log(response.data.name[0]);
+        admin.auth()
+          .verifyIdToken(firebaseAccessToken)
+          .then(decodedToken => {
+            update(ref(database, 'users/' + decodedToken.uid), {
+              spotify: {
+                artistNames: artistNames,
+                artistGenres: artistGenres
+              },
+              spotifyLinked: true
+            }).then(() => {
+              res.redirect('/spotify-success');
+            }).catch(() => {
+              //console.log("Adding Spotify failed");
+              return res.status(500).send("Adding Spotify failure");
+            })
+
+          })
+          .catch(error => {
+            throw new Error('Error while verifying token:', error)
+          })
+
+      }).catch(error => {
+        res.send(error);
+      })
+      //res.redirect('/spotify-success')
+    }
+  });
+})
 
 app.get('/auth/token', (req, res) => {
-    
-    res.json(
-       {
-          access_token: access_token
-       })
 
-    //console.log(res.json());
-  })
+  res.json(
+    {
+      access_token: access_token
+    })
+
+  //console.log(res.json());
+})
 
 let spoonacularUrl = env["spoonacular_url"];
 let spoonacularApi = env["spoonacular_key"];
 
 app.get("/", (req, res) => {
   res.send("HarmonyPlate API")
-})
-
-app.get("/api", (req, res) => {
-  res.json({ "users": ["userOne", "userTwo"] })
 })
 
 app.get("/auth/search", (req, res) => {
@@ -247,16 +243,16 @@ app.get("/auth/search", (req, res) => {
   console.log(req.query);
 
   if (!query) {
-    return res.status(400).send({ "error": "Invalid Query" });
+    return res.status(400).json({ "error": "Invalid Query" });
   }
 
-  if (!cuisine) {
-    return res.status(400).send({ "error": "No cuisine chosen" });
+  if (!cuisine || cuisine === "") {
+    return res.status(400).json({ "error": "Invalid cuisine" });
   }
   let url = `${spoonacularUrl}recipes/complexSearch?query=${query}&cuisine=${cuisine}${diet ? '&diet=' + diet : ''}&apiKey=${spoonacularApi}`
   axios.get(url).then(response => {
     console.log(url)
-    return res.status(200).send({ "options": response.data.results });
+    return res.status(200).json({ "options": response.data.results });
   })
 })
 
@@ -264,22 +260,50 @@ app.post("/auth/foodChoice", async (req, res) => {
   // verify input is valid
   let body = req.body;
 
-  if (
-    !body.hasOwnProperty("chosenFood") ||
-    body.chosenFood.trim() === ""
-  ) {
-    return res.status(400).send("Invalid request.");
+  if (!body.hasOwnProperty("chosenFood")) {
+    return res.status(400).json({
+      "error": "No food chosen"
+    });
   }
+
+  if (!body.hasOwnProperty("chosenFood")) {
+    return res.status(400).json({
+      "error": "No food chosen"
+    });
+  }
+
+  if (!body.hasOwnProperty("cuisine")) {
+    return res.status(400).json({
+      "error": "No cuisine chosen"
+    });
+  }
+
+  if (!body.hasOwnProperty("diet")) {
+    return res.status(400).json({
+      "error": "No diet chosen"
+    });
+  }
+
+  let food = body.chosenFood;
+  let diet = body.diet === "" ? "No preference" : body.diet;
+  let cuisine = body.cuisine;
+
+  console.log(food, diet, cuisine)
+
 
   console.log(body.chosenFood)
   admin.auth()
     .verifyIdToken(req.headers.authorization)
     .then(decodedToken => {
       update(ref(database, 'users/' + decodedToken.uid), {
-        food: { favoriteFood: body.chosenFood }
+        food: {
+          favoriteFood: food,
+          diet: diet,
+          cuisine: cuisine
+        }
       }).catch(() => {
         console.log("Adding Favorite Food failed");
-        return res.status(500).send("Adding Favorite Food failure");
+        return res.status(500).json("Adding Favorite Food failure");
       })
 
     })
@@ -307,7 +331,7 @@ app.post('/auth/submit-desc', async (req, res) => {
     .verifyIdToken(req.headers.authorization)
     .then(decodedToken => {
       update(ref(database, 'users/' + decodedToken.uid), {
-        description: body.desc 
+        description: body.desc
       }).catch(() => {
         console.log("Adding desc failed");
         return res.status(500).send("Adding desc failure");
@@ -325,28 +349,28 @@ const pictureCounters = {};
 const storage = multer.diskStorage({
   destination: async (req, file, cb) => {
     try {
-        const token = req.headers.authorization?.split(' ')[1];
-        const decodedToken = await admin.auth().verifyIdToken(token);
-        
-        const userID = decodedToken.uid; 
+      const token = req.headers.authorization?.split(' ')[1];
+      const decodedToken = await admin.auth().verifyIdToken(token);
 
-        
-        const userFolderPath = path.join('../front/public/uploads', userID);
-        fs.mkdirSync(userFolderPath, { recursive: true });
+      const userID = decodedToken.uid;
 
-        //req.decodedToken = decodedToken;
 
-        cb(null, userFolderPath);
+      const userFolderPath = path.join('../front/public/uploads', userID);
+      fs.mkdirSync(userFolderPath, { recursive: true });
+
+      //req.decodedToken = decodedToken;
+
+      cb(null, userFolderPath);
     } catch (error) {
-        cb(error);
+      cb(error);
     }
-},
+  },
   filename: async (req, file, cb) => {
     try {
       const fileExtension = path.extname(file.originalname);
       const token = req.headers.authorization?.split(' ')[1];
       const decodedToken = await admin.auth().verifyIdToken(token);
-      const userID = decodedToken.uid; 
+      const userID = decodedToken.uid;
       //console.log(userID);
       //console.log(token);
 
@@ -358,10 +382,10 @@ const storage = multer.diskStorage({
       const uniqueFilename = `${userID}_${pictureNumber}${fileExtension}`;
 
       cb(null, uniqueFilename);
-  } catch (error) {
+    } catch (error) {
       cb(error);
-  }
-   
+    }
+
   }
 });
 
@@ -370,9 +394,9 @@ const upload = multer({ storage });
 // Route to handle image upload
 app.post('/auth/upload', upload.single('image'), (req, res) => {
   if (req.file) {
-      res.json({ imageUrl: '/uploads/${req.file.filename}' });
+    res.json({ imageUrl: '/uploads/${req.file.filename}' });
   } else {
-      res.status(400).json({ message: 'No file uploaded' });
+    res.status(400).json({ message: 'No file uploaded' });
   }
 });
 
