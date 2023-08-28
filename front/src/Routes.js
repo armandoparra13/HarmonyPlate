@@ -93,6 +93,7 @@ export const AppRoutes = () => {
                   )
                   }
                 />
+                
               <Route 
                 path="/upload-pictures" 
                 element={
