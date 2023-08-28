@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import "./FoodPage.css"
 import { useAuth } from '../../Auth';
 import axios from 'axios';
+import { useNavigate } from "react-router-dom";
 
 function FoodPage() {
     const { currentUser } = useAuth();
@@ -12,6 +13,7 @@ function FoodPage() {
     const [errorMessage, setErrorMessage] = useState('');
     const [options, setOptions] = useState([]);
     const [optionChosen, setOptionChosen] = useState('');
+    const navigate = useNavigate();
 
     const onSubmit = (e) => {
         e.preventDefault();
@@ -43,22 +45,35 @@ function FoodPage() {
             previouslySelected.classList.remove('selected-option');
         }
         e.currentTarget.classList.add('selected-option');
-        setOptionChosen(e.target.id);
+        setOptionChosen(e.currentTarget.id); //changed target 
+        console.log(e.currentTarget.id);
     }
 
-    const submitChoice = (e) => {
-        if (options.length === 0 || optionChosen) {
-            console.log(optionChosen);
-            axios.post('/auth/foodChoice',
-                { chosenFood: optionChosen },
-                {
-                    headers: {
-                        authorization: currentUser.accessToken,
-                    },
-                })
+    const submitChoice = () => {
+        console.log('yuh');
+        console.log(optionChosen);
+      
+        //options.length is the issue here
+        if ( optionChosen !== '') {
+            console.log('hi');
+          axios.post(
+            '/auth/foodChoice',
+            { chosenFood: optionChosen },
+            {
+              headers: {
+                authorization: currentUser.accessToken,
+              },
+            }
+          ).then(() => {
+            console.log('Food choice submitted successfully.');
+            navigate('/create-profile');
+            // You might want to perform additional actions upon successful submission
+          }).catch(error => {
+            console.error('Error submitting food choice:', error);
+            // Handle the error accordingly
+          });
         }
-
-    }
+      };
 
     return (
         <div className="food-page">
@@ -79,7 +94,7 @@ function FoodPage() {
                 <select
                     className="custom-food-select"
                     name="cuisine"
-                    onClick={(e) => (
+                    onChange={(e) => (
                         setCuisine(e.target.value)
                     )}
                 >
