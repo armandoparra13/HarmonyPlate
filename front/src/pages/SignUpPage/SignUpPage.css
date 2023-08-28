@@ -48,3 +48,8 @@ label {
 button:hover {
     background-color: #E26F74; /* Slightly darkened color for hover effect */
 }
+
+.error-message {
+    color: red;
+    margin-bottom: 15px;
+}

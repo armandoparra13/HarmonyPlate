@@ -11,8 +11,10 @@ const SignUp = () => {
         dob: '',
         password: '',
         confirmPassword: '',
-        gender: 'male'
+        gender: 'Select'
     });
+    const [errorMessage, setErrorMessage] = useState("");  // New error state
+    
     const navigate = useNavigate();
     const { login } = useAuth()
 
@@ -26,6 +28,12 @@ const SignUp = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Check if passwords match
+        if (formData.password !== formData.confirmPassword) {
+            setErrorMessage("Passwords do not match!");
+            return;  // Stop the function execution here
+        }
 
         const dataToSend = {
             username: formData.name,
@@ -60,7 +68,7 @@ const SignUp = () => {
                 </div>
                 <div className="input-group">
                     <label htmlFor="email">Email:</label>
-                    <input type="email" id="email" name="email" required onChange={handleChange} value={formData.email} />
+                    <input className="custom-input" type="email" id="email" name="email" required onChange={handleChange} value={formData.email} />
                 </div>
                 <div className="input-group">
                     <label htmlFor="dob">Date of Birth:</label>
@@ -68,11 +76,11 @@ const SignUp = () => {
                 </div>
                 <div className="input-group">
                     <label htmlFor="password">Password:</label>
-                    <input className="custom-input" id="password" name="password" required onChange={handleChange} value={formData.password} />
+                    <input className="custom-input" type="password" id="password" name="password" required onChange={handleChange} value={formData.password} />
                 </div>
                 <div className="input-group">
                     <label htmlFor="confirmPassword">Retype Password:</label>
-                    <input className="custom-input" id="confirmPassword" name="confirmPassword" required onChange={handleChange} value={formData.confirmPassword} />
+                    <input className="custom-input" type="password" id="confirmPassword" name="confirmPassword" required onChange={handleChange} value={formData.confirmPassword} />
                 </div>
                 <div className="input-group">
                     <label htmlFor="gender">Gender:</label>
@@ -82,6 +90,10 @@ const SignUp = () => {
                         <option value="nonbinary">Nonbinary</option>
                     </select>
                 </div>
+
+                {/* Display error message if it exists */}
+                {errorMessage && <div className="error-message">{errorMessage}</div>}
+
                 <div className="input-group">
                     <button className="input-group-button" type="submit">Sign Up</button>
                 </div>
