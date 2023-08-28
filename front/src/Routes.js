@@ -46,7 +46,7 @@ export const AppRoutes = () => {
     return <LoadingComponent />;
   }
 
-  const { picturesUploaded, spotifyLinked, foodChosen } = userData;
+  const { picturesUploaded, spotifyLinked, foodsChosen } = userData;
 
   return (
     <div>
@@ -63,20 +63,62 @@ export const AppRoutes = () => {
           ) : (
             // Private routes
             <>
-              <Route path="/upload-pictures" element={<UploadPictures />} />
-              <Route path="/spotify-login" element={<SpotifyLoginPage />} />
-              <Route path="/food" element={<FoodPage />} />
-              <Route path="/create-profile" element={<CreateProfilePage />} />
+              <Route 
+                path="/upload-pictures" 
+                element={
+                  spotifyLinked && picturesUploaded && foodsChosen ? (
+                    <Navigate to="/create-profile" />
+                  ) : (
+                    <UploadPictures /> 
+                  )
+                }
+              />
+              <Route 
+                path="/spotify-login" 
+                element={
+                  spotifyLinked && picturesUploaded && foodsChosen ? (
+                    <Navigate to="/create-profile" />
+                  ) : (
+                    <SpotifyLoginPage />
+                  )
+                  }
+                />
+
+              <Route 
+                path="/food" 
+                element={
+                  spotifyLinked && picturesUploaded && foodsChosen ? (
+                    <Navigate to="/create-profile" />
+                  ) : (
+                    <FoodPage />
+
+                  )
+                }
+              />
+              <Route 
+                path="/create-profile" 
+                element={
+                  spotifyLinked && picturesUploaded && foodsChosen ? (
+                    <CreateProfilePage />
+                  ) : (
+                    <>
+                      {!picturesUploaded && <Navigate to="/upload-pictures" />}
+                      {!spotifyLinked && <Navigate to="/spotify-login" />}
+                      {!foodsChosen && <Navigate to="/food" />}
+                    </>
+                  )
+                  }
+                />
               <Route
                 path="/SignUp"
                 element={
-                  spotifyLinked && picturesUploaded && foodChosen ? (
+                  spotifyLinked && picturesUploaded && foodsChosen ? (
                     <Navigate to="/create-profile" />
                   ) : (
                     <>
                       {!picturesUploaded && <Navigate to="/upload-pictures" />}
                       {!spotifyLinked && <Navigate to="/spotify-login" />}
-                      {!foodChosen && <Navigate to="/food" />}
+                      {!foodsChosen && <Navigate to="/food" />}
                     </>
                   )
                 }
@@ -85,13 +127,13 @@ export const AppRoutes = () => {
               <Route
                 path="/"
                 element={
-                  spotifyLinked && picturesUploaded && foodChosen ? (
+                  spotifyLinked && picturesUploaded && foodsChosen ? (
                     <Navigate to="/matching" />
                   ) : (
                     <>
                       {!picturesUploaded && <Navigate to="/upload-pictures" />}
                       {!spotifyLinked && <Navigate to="/spotify-login" />}
-                      {!foodChosen && <Navigate to="/food" />}
+                      {!foodsChosen && <Navigate to="/food" />}
                     </>
                   )
                 }
@@ -100,13 +142,13 @@ export const AppRoutes = () => {
               <Route
                 path="/matching"
                 element={
-                  spotifyLinked && picturesUploaded && foodChosen ? (
+                  spotifyLinked && picturesUploaded && foodsChosen ? (
                     <MatchingPage />
                   ) : (
                     <>
                       {!picturesUploaded && <Navigate to="/upload-pictures" />}
                       {!spotifyLinked && <Navigate to="/spotify-login" />}
-                      {!foodChosen && <Navigate to="/food" />}
+                      {!foodsChosen && <Navigate to="/food" />}
                     </>
                   )
                 }

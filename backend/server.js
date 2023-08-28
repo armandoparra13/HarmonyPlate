@@ -242,26 +242,34 @@ app.get("/api", (req, res) => {
   res.json({ "users": ["userOne", "userTwo"] })
 })
 
-app.get("/auth/search", (req, res) => {
-  let query = req.query.query;
-  let cuisine = req.query.cuisine;
-  let diet = req.query.diet;
+app.get("/auth/search", async (req, res) => {
+  try {
+    const query = req.query.query;
+    const cuisine = req.query.cuisine;
+    const diet = req.query.diet;
 
-  console.log(req.query);
+    if (!query) {
+      return res.status(400).json({ error: "Invalid Query" });
+    }
 
-  if (!query) {
-    return res.status(400).send({ "error": "Invalid Query" });
+    if (!cuisine) {
+      return res.status(400).json({ error: "No cuisine chosen" });
+    }
+
+    const url = `${spoonacularUrl}recipes/complexSearch?query=${query}&cuisine=${cuisine}${diet ? '&diet=' + diet : ''}&apiKey=${spoonacularApi}`;
+
+    const response = await axios.get(url);
+
+    if (response.data && response.data.results) {
+      return res.status(200).json({ options: response.data.results });
+    } else {
+      return res.status(500).json({ error: "Error fetching search results" });
+    }
+  } catch (error) {
+    console.error("Error during search:", error);
+    return res.status(500).json({ error: "An error occurred during the search" });
   }
-
-  if (!cuisine) {
-    return res.status(400).send({ "error": "No cuisine chosen" });
-  }
-  let url = `${spoonacularUrl}recipes/complexSearch?query=${query}&cuisine=${cuisine}${diet ? '&diet=' + diet : ''}&apiKey=${spoonacularApi}`
-  axios.get(url).then(response => {
-    console.log(url)
-    return res.status(200).send({ "options": response.data.results });
-  })
-})
+});
 
 app.post("/auth/foodChoice", async (req, res) => {
   // verify input is valid
@@ -275,20 +283,23 @@ app.post("/auth/foodChoice", async (req, res) => {
   }
 
   console.log(body.chosenFood)
-  admin.auth()
-    .verifyIdToken(req.headers.authorization)
-    .then(decodedToken => {
-      update(ref(database, 'users/' + decodedToken.uid), {
-        food: { favoriteFood: body.chosenFood }
-      }).catch(() => {
-        console.log("Adding Favorite Food failed");
-        return res.status(500).send("Adding Favorite Food failure");
-      })
-
-    })
-    .catch(error => {
-      throw new Error('Error while verifying token:', error)
-    })
+  admin
+  .auth()
+  .verifyIdToken(req.headers.authorization)
+  .then((decodedToken) => {
+    return update(ref(database, 'users/' + decodedToken.uid), {
+      food: { favoriteFood: body.chosenFood },
+      foodsChosen: true
+    });
+  })
+  .then(() => {
+    console.log('Adding Favorite Food succeeded');
+    return res.status(200).send('Food choice submitted successfully.');
+  })
+  .catch((error) => {
+    console.error('Error while processing food choice:', error);
+    return res.status(500).send('Food choice submission failed.');
+  });
 
 })
 
