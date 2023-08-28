@@ -252,7 +252,7 @@ app.get("/auth/search", async (req, res) => {
       return res.status(400).json({ error: "Invalid Query" });
     }
 
-    if (!cuisine) {
+    if (!cuisine || cuisine === "") {
       return res.status(400).json({ error: "No cuisine chosen" });
     }
 
@@ -279,16 +279,37 @@ app.post("/auth/foodChoice", async (req, res) => {
     !body.hasOwnProperty("chosenFood") ||
     body.chosenFood.trim() === ""
   ) {
-    return res.status(400).send("Invalid request.");
+    return res.status(400).send("No food chosen");
   }
 
+  if (!body.hasOwnProperty("cuisine")) {
+    return res.status(400).json({
+      "error": "No cuisine chosen"
+    });
+  }
+
+  if (!body.hasOwnProperty("diet")) {
+    return res.status(400).json({
+      "error": "No diet chosen"
+    });
+  }
+
+  let food = body.chosenFood;
+  let diet = body.diet === "" ? "No preference" : body.diet;
+  let cuisine = body.cuisine;
+
+  console.log(food, diet, cuisine)
   console.log(body.chosenFood)
   admin
   .auth()
   .verifyIdToken(req.headers.authorization)
   .then((decodedToken) => {
     return update(ref(database, 'users/' + decodedToken.uid), {
-      food: { favoriteFood: body.chosenFood },
+      food: {
+        favoriteFood: food,
+        diet: diet,
+        cuisine: cuisine
+      },
       foodsChosen: true
     });
   })
@@ -298,7 +319,7 @@ app.post("/auth/foodChoice", async (req, res) => {
   })
   .catch((error) => {
     console.error('Error while processing food choice:', error);
-    return res.status(500).send('Food choice submission failed.');
+    return res.status(500).json('Food choice submission failed.');
   });
 
 })
@@ -339,20 +360,20 @@ const pictureCounters = {};
 const storage = multer.diskStorage({
   destination: async (req, file, cb) => {
     try {
-        const token = req.headers.authorization?.split(' ')[1];
-        const decodedToken = await admin.auth().verifyIdToken(token);
+      const token = req.headers.authorization?.split(' ')[1];
+      const decodedToken = await admin.auth().verifyIdToken(token);
         
-        const userID = decodedToken.uid; 
+      const userID = decodedToken.uid; 
 
         
-        const userFolderPath = path.join('../front/public/uploads', userID);
-        fs.mkdirSync(userFolderPath, { recursive: true });
+      const userFolderPath = path.join('../front/public/uploads', userID);
+      fs.mkdirSync(userFolderPath, { recursive: true });
 
         //req.decodedToken = decodedToken;
 
-        cb(null, userFolderPath);
+      cb(null, userFolderPath);
     } catch (error) {
-        cb(error);
+      cb(error);
     }
 },
   filename: async (req, file, cb) => {
@@ -384,23 +405,23 @@ const upload = multer({ storage });
 // Route to handle image upload
 app.post('/auth/upload', upload.single('image'), (req, res) => {
   if (req.file) {
-      res.json({ imageUrl: '/uploads/${req.file.filename}' });
-      const idToken = req.headers.authorization?.replace('Bearer ', '');
-      admin.auth()
-        .verifyIdToken(idToken)
-          .then(decodedToken => {
-              update(ref(database, 'users/' + decodedToken.uid), {
-                picturesUploaded: true
+    res.json({ imageUrl: '/uploads/${req.file.filename}' });
+    const idToken = req.headers.authorization?.replace('Bearer ', '');
+    admin.auth()
+    .verifyIdToken(idToken)
+    .then(decodedToken => {
+      update(ref(database, 'users/' + decodedToken.uid), {
+        picturesUploaded: true
   
-              }).catch(() => {
+      }).catch(() => {
                 
-                return res.status(500).send("Adding picture failure");
-              })
+        return res.status(500).send("Adding picture failure");
+      })
         
-            })
-            .catch(error => {
-              throw new Error('Error while verifying token:', error)
-            })
+    })
+    .catch(error => {
+      throw new Error('Error while verifying token:', error)
+    })
   } else {
       res.status(400).json({ message: 'No file uploaded' });
   }

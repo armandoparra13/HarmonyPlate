@@ -25,7 +25,7 @@ function FoodPage() {
             })
             .then((data) => {
                 if (data.error) {
-                    setValidSearch(true);
+                    setValidSearch(false);
                     setErrorMessage(data.error);
                 } else {
                     setValidSearch(true);
@@ -50,7 +50,6 @@ function FoodPage() {
     }
 
     const submitChoice = () => {
-        console.log('yuh');
         console.log(optionChosen);
       
         //options.length is the issue here
@@ -58,7 +57,11 @@ function FoodPage() {
             console.log('hi');
           axios.post(
             '/auth/foodChoice',
-            { chosenFood: optionChosen },
+            {
+                chosenFood: optionChosen,
+                cuisine: cuisine,
+                diet: diet
+            },
             {
               headers: {
                 authorization: currentUser.accessToken,
@@ -160,7 +163,7 @@ function FoodPage() {
                         {options.map((data, i) => (
                             <button className="option" id={data.id} key={i} name={data.title} onClick={onChoose}>
                                 <div>{data.title}</div>
-                                <img className="food-img" src={data.image} alt=""></img>
+                                <img className="food-img" id={data.id} src={data.image} alt=""></img>
                             </button>
                         ))}
                     </>
