@@ -152,7 +152,7 @@ app.post("/foodChoice", async (req, res) => {
 
 })
 
-app.get("/getMatches", (req, res) => {
+app.get("/auth/getMatches", (req, res) => {
   let usersSnapshot = query(ref(database, 'users'), orderByKey(), limitToFirst(10));
   let randomUserIds = [];
 
