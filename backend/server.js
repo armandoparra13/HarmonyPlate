@@ -1,6 +1,6 @@
 import express from 'express';
 import { initializeApp } from 'firebase/app';
-import { getDatabase, ref, set, update } from "firebase/database";
+import { getDatabase, limitToFirst, ref, set, update, query, orderByKey, onValue, child} from "firebase/database";
 import env from './env_backend.json' assert { type: 'json' };
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import axios from 'axios';
@@ -289,13 +289,46 @@ app.post("/auth/foodChoice", async (req, res) => {
 
 })
 
+app.get("/auth/getMatches", (req, res) => {
+  let usersSnapshot = query(ref(database, 'users'), orderByKey(), limitToFirst(10));
+  let randomUserIds = [];
+
+    admin.auth()
+    .verifyIdToken(req.headers.authozriation)
+    .then(decodedToken => {
+      onValue(usersSnapshot, (snapshot) => {
+        snapshot.forEach((childSnapshot) => {
+          let childKey = childSnapshot.key;
+          if (decodedToken.uid !== childKey) {
+            console.log(childKey);
+            randomUserIds.push(childKey);
+          }
+        });
+      
+      update(ref(database, 'users/' + decodedToken.uid), {
+        pool: randomUserIds
+      }).catch(() => {
+        console.log("Updating user pool failed");
+        return res.status(500).send("Updating user pool failed");
+      })
+
+      }, {
+        onlyOnce: true
+      });
+    })
+    .catch(error => {
+      throw new Error('Error while verifying token:', error)
+    })
+
+});
+
 app.get("/auth/recipe/:id", (req, res) => {
   let id = req.params.id;
   axios.get(`${spoonacularUrl}recipes/${id}/information?apiKey=${spoonacularApi}`).then(response => {
     console.log(response);
     res.status(200).send(response.data);
   })
-})
+})  
 
 //description
 
