@@ -28,7 +28,7 @@ label {
     margin-bottom: 10px; /* Increased margin for better spacing */
 }
 
-.custom-input, select {
+.custom-input, .custom-select {
     width: 100%;
     padding: 10px; /* Increased padding for better appearance */
     border: 1px solid #ccc;

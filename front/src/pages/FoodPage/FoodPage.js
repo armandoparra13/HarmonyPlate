@@ -17,7 +17,7 @@ function FoodPage() {
         e.preventDefault();
         setOptionChosen([]);
 
-        fetch(`/search?query=${keyword}&cuisine=${cuisine}&diet=${diet}`)
+        fetch(`/auth/search?query=${keyword}&cuisine=${cuisine}&diet=${diet}`)
             .then((response) => {
                 return response.json();
             })
@@ -29,7 +29,6 @@ function FoodPage() {
                     setValidSearch(true);
                     setErrorMessage('');
                     setOptions(data.options);
-                    console.log(options);
                 }
             })
             .catch((error) => {
@@ -39,20 +38,18 @@ function FoodPage() {
 
     const onChoose = (e) => {
         const previouslySelected = document.querySelector('.selected-option');
+        console.log(e)
         if (previouslySelected) {
             previouslySelected.classList.remove('selected-option');
         }
-        e.target.classList.add('selected-option');
+        e.currentTarget.classList.add('selected-option');
         setOptionChosen(e.target.id);
-
     }
-
-    console.log(currentUser.accessToken)
 
     const submitChoice = (e) => {
         if (options.length === 0 || optionChosen) {
             console.log(optionChosen);
-            axios.post('/foodChoice',
+            axios.post('/auth/foodChoice',
                 { chosenFood: optionChosen },
                 {
                     headers: {
@@ -64,10 +61,11 @@ function FoodPage() {
     }
 
     return (
-        <div>
-            <div>
-                <label>Keyword:</label>
+        <div className="food-page">
+            <div className="input-group">
+                <label>Type in a food:</label>
                 <input
+                    className="custom-food-input"
                     id="keyword"
                     type="text"
                     name="keyword"
@@ -76,10 +74,10 @@ function FoodPage() {
                     )}
                 />
             </div>
-            <div>
-                <label>Cuisine:</label>
+            <div className="input-group">
+                <label>Choose a cuisine:</label>
                 <select
-                    class="cuisine"
+                    className="custom-food-select"
                     name="cuisine"
                     onClick={(e) => (
                         setCuisine(e.target.value)
@@ -115,10 +113,10 @@ function FoodPage() {
                     <option value="vietnamese">Vietnamese</option>
                 </select>
             </div>
-            <div>
-                <label>Diet:</label>
+            <div className="input-group">
+                <label>Choose a diet (or you can leave it blank):</label>
                 <select
-                    class="diet"
+                    className="custom-select"
                     name="diet"
                     onClick={(e) => (
                         setDiet(e.target.value))}
@@ -137,21 +135,24 @@ function FoodPage() {
                     <option value="whole30">Whole30</option>
                 </select>
             </div>
-            <button class="submit" onClick={onSubmit}>Search</button>
-            <div class="options">
+            <button className="input-group-button" onClick={onSubmit}>Search</button>
+            <div className="options">
                 {!validSearch ? (
                     <div>{errorMessage}</div>
                 ) : options.length === 0 ? (<div>No options found. Change choices or finish.</div>) : (
                     <>
                         <div>Which one sounds the best to you</div>
                         {options.map((data, i) => (
-                            <button className="option" id={data.id} key={i} name={data.title} onClick={onChoose}>{data.title}</button>
+                            <button className="option" id={data.id} key={i} name={data.title} onClick={onChoose}>
+                                <div>{data.title}</div>
+                                <img className="food-img" src={data.image} alt=""></img>
+                            </button>
                         ))}
                     </>
                 )}
             </div>
 
-            {validSearch && <button class="submit" onClick={submitChoice}>Finish</button>}
+            {validSearch && <button className="input-group-button" onClick={submitChoice}>Finish</button>}
         </div >
     );
 }
