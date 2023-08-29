@@ -156,11 +156,9 @@ app.get("/getMatches", (req, res) => {
   let usersSnapshot = query(ref(database, 'users'), orderByKey(), limitToFirst(10));
   let randomUserIds = [];
 
-    // update user pool start
     admin.auth()
-    .verifyIdToken(req.headers.authorization)
+    .verifyIdToken(req.headers.authozriation)
     .then(decodedToken => {
-      //first get 10 random users
       onValue(usersSnapshot, (snapshot) => {
         snapshot.forEach((childSnapshot) => {
           let childKey = childSnapshot.key;
@@ -170,7 +168,6 @@ app.get("/getMatches", (req, res) => {
           }
         });
       
-      //then update current user pool
       update(ref(database, 'users/' + decodedToken.uid), {
         pool: randomUserIds
       }).catch(() => {
