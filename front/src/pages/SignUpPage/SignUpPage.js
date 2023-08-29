@@ -44,7 +44,7 @@ const SignUp = () => {
         };
 
         try {
-            const response = await axios.post('/signup', dataToSend);
+            const response = await axios.post('/auth/signup', dataToSend);
 
             console.log(response.data);
             try {
@@ -84,7 +84,7 @@ const SignUp = () => {
                 </div>
                 <div className="input-group">
                     <label htmlFor="gender">Gender:</label>
-                    <select id="gender" name="gender" onChange={handleChange} value={formData.gender}>
+                    <select className="custom-select" id="gender" name="gender" onChange={handleChange} value={formData.gender}>
                         <option value="male">Male</option>
                         <option value="female">Female</option>
                         <option value="nonbinary">Nonbinary</option>
