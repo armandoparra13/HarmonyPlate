@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import { useAuth } from '../../Auth';
 import { useNavigate } from 'react-router-dom';
+import './UploadPictures.css'
 
-function UploadPictures({ setUserData, setLoadingUserData  }) {
+function UploadPictures({ setUserData, setLoadingUserData }) {
   const { currentUser } = useAuth();
   const [selectedImage, setSelectedImage] = useState(null);
   const navigate = useNavigate();
   let [description, setDescription] = useState('');
-  
+
 
   const fetchUserData = async () => {
     if (currentUser) {
@@ -27,7 +28,7 @@ function UploadPictures({ setUserData, setLoadingUserData  }) {
         setLoadingUserData(false);
       }
     }
-};
+  };
 
   const handleDescChange = (event) => {
     setDescription(event.target.value);
@@ -44,7 +45,7 @@ function UploadPictures({ setUserData, setLoadingUserData  }) {
           },
         }
       );
-  
+
       console.log('Response from server:', response.data);
     } catch (error) {
       console.error('Error while submitting description:', error.message);
@@ -57,60 +58,60 @@ function UploadPictures({ setUserData, setLoadingUserData  }) {
   };
 
   const handleImageUpload = async () => {
- 
 
-  if (!selectedImage || !currentUser) {
-    return;
-  }
-  const formData = new FormData();
-  formData.append('image', selectedImage);
-    
-  try {
-    const response = await axios.post('/auth/upload', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        Authorization: `Bearer ${currentUser.accessToken}`,
-      },
-    }).then((response) => {
-      fetchUserData();
-      console.log(response.data);
-    })
-    
-    
+
+    if (!selectedImage || !currentUser) {
+      return;
+    }
+    const formData = new FormData();
+    formData.append('image', selectedImage);
+
+    try {
+      const response = await axios.post('/auth/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${currentUser.accessToken}`,
+        },
+      }).then((response) => {
+        fetchUserData();
+        console.log(response.data);
+      })
+
+
     } catch (error) {
       console.error(error);
     }
   };
   const handleNextClick = () => {
     // Navigate to a different page 
-   
+
     navigate("/spotify-login");
   };
 
-    return (
+  return (
+    <div className="pictures-container">
       <div>
-        <div>
-          <h2>Add a description about yourself:</h2>
-          <form onSubmit={handleDescSubmit}>
-            <label>
-              Profile Description:
-              <textarea
-                value={description}
-                onChange={handleDescChange}
-                rows="4"
-                cols="50"
-              />
-            </label>
-            <button type="submit">Save Description</button>
-          </form>
-        </div>
-        <h2>Upload profile pictures!</h2>
-        <input type="file" accept="image/*" onChange={handleImageChange} />
-        <button onClick={handleImageUpload}>Upload Image</button>
-        <p>Please upload at least 2 pictures to continue.</p>
-        <button onClick={handleNextClick}>Next</button>
+        <h2>Add a description about yourself:</h2>
+        <form onSubmit={handleDescSubmit}>
+          <label>
+            Profile Description:
+            <textarea
+              value={description}
+              onChange={handleDescChange}
+              rows="4"
+              cols="50"
+            />
+          </label>
+          <button type="submit">Save Description</button>
+        </form>
       </div>
-    );
-  }
-  
-  export default UploadPictures;
+      <h2>Upload profile pictures!</h2>
+      <input type="file" accept="image/*" onChange={handleImageChange} />
+      <button onClick={handleImageUpload}>Upload Image</button>
+      <p>Please upload at least 2 pictures to continue.</p>
+      <button onClick={handleNextClick}>Next</button>
+    </div>
+  );
+}
+
+export default UploadPictures;

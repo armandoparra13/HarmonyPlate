@@ -8,7 +8,6 @@ import {
 } from 'react-router-dom';
 import LoginPage from './pages/LoginPage/LoginPage';
 import { MatchingPage } from './pages/MatchingPage/MatchingPage';
-import CreateProfilePage from './pages/ProfileCreationPage/CreateProfilePage';
 import SignUp from './pages/SignUpPage/SignUpPage';
 import FoodPage from './pages/FoodPage/FoodPage';
 import SpotifyLoginPage from './pages/SpotifyLoginPage/SpotifyLoginPage';
@@ -18,18 +17,13 @@ import ChatPage from './pages/ChatPage/ChatPage';
 import io from 'socket.io-client';
 import { useAuth } from './Auth';
 import axios from 'axios';
+import Sidebar from './components/Sidebar/Sidebar';
+import HomePage from './pages/HomePage/HomePage';
 
 const LoadingComponent = () => {
   return <div>Loading...</div>;
   return <div>Loading...</div>;
 };
-import Sidebar from './components/Sidebar/Sidebar';
-import HomePage from './pages/HomePage/HomePage';
-
-const socket = io.connect('http://localhost:3000', {
-  transports: ['websocket'],
-  withCredentials: true,
-});
 
 export const AppRoutes = () => {
   const { currentUser } = useAuth();
@@ -130,7 +124,7 @@ export const AppRoutes = () => {
                   path="/create-profile"
                   element={
                     spotifyLinked && picturesUploaded && foodsChosen ? (
-                      <CreateProfilePage />
+                      <HomePage />
                     ) : (
                       <>
                         {!foodsChosen && <Navigate to="/food" />}
