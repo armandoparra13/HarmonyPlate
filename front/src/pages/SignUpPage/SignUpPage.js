@@ -61,7 +61,7 @@ const SignUp = () => {
    
 
     return (
-        <div className="container">
+        <div className="signUpContainer">
             <h2>Harmony Plate Sign Up</h2>
             <form onSubmit={handleSubmit}>
                 <div className="input-group">

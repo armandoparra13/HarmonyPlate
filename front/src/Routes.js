@@ -21,7 +21,10 @@ import axios from 'axios';
 
 const LoadingComponent = () => {
   return <div>Loading...</div>;
+  return <div>Loading...</div>;
 };
+import Sidebar from './components/Sidebar/Sidebar';
+import HomePage from './pages/HomePage/HomePage';
 
 const socket = io.connect('http://localhost:3000', {
   transports: ['websocket'],
@@ -66,124 +69,133 @@ export const AppRoutes = () => {
   return (
     <div>
       <Router>
-        <Routes>
-          <Route path="/spotify-success" element={<SpotifySuccessPage />} />
-          <Route path="/chat" element={<ChatPage socket={socket} />} />
+        <Sidebar>
+          <Routes>
+            <Route path="/spotify-success" element={<SpotifySuccessPage />} />
 
-          {/* Public routes */}
-          {!currentUser ? (
-            <>
-              <Route path="/" element={<LoginPage />} />
-              <Route path="/SignUp" element={<SignUp />} />
-              <Route path="/*" element={<Navigate to="/" />} />
-            </>
-          ) : (
-            // Private routes
-            <>
-              <Route
-                path="/food"
-                element={
-                  spotifyLinked && picturesUploaded && foodsChosen ? (
-                    <Navigate to="/create-profile" />
-                  ) : (
-                    <FoodPage
-                      setUserData={setUserData}
-                      setLoadingUserData={setLoadingUserData}
-                    />
-                  )
-                }
-              />
+            {/* Public routes */}
+            {!currentUser ? (
+              <>
+                <Route path="/" element={<LoginPage />} />
+                <Route path="/SignUp" element={<SignUp />} />
+                <Route path="/*" element={<Navigate to="/" />} />
+              </>
+            ) : (
+              // Private routes
+              <>
+                <Route
+                  path="/food"
+                  element={
+                    spotifyLinked && picturesUploaded && foodsChosen ? (
+                      <Navigate to="/create-profile" />
+                    ) : (
+                      <FoodPage
+                        setUserData={setUserData}
+                        setLoadingUserData={setLoadingUserData}
+                      />
+                    )
+                  }
+                />
 
-              <Route
-                path="/spotify-login"
-                element={
-                  spotifyLinked && picturesUploaded && foodsChosen ? (
-                    <Navigate to="/create-profile" />
-                  ) : (
-                    <SpotifyLoginPage
-                      setUserData={setUserData}
-                      setLoadingUserData={setLoadingUserData}
-                    />
-                  )
-                }
-              />
+                <Route
+                  path="/spotify-login"
+                  element={
+                    spotifyLinked && picturesUploaded && foodsChosen ? (
+                      <Navigate to="/create-profile" />
+                    ) : (
+                      <SpotifyLoginPage
+                        setUserData={setUserData}
+                        setLoadingUserData={setLoadingUserData}
+                      />
+                    )
+                  }
+                />
 
-              <Route
-                path="/upload-pictures"
-                element={
-                  currentUser && loadingUserData ? (
-                    <LoadingComponent />
-                  ) : spotifyLinked && picturesUploaded && foodsChosen ? (
-                    <Navigate to="/create-profile" />
-                  ) : (
-                    <UploadPictures
-                      setUserData={setUserData}
-                      setLoadingUserData={setLoadingUserData}
-                    />
-                  )
-                }
-              />
-              <Route
-                path="/create-profile"
-                element={
-                  spotifyLinked && picturesUploaded && foodsChosen ? (
-                    <CreateProfilePage />
-                  ) : (
-                    <>
-                      {!foodsChosen && <Navigate to="/food" />}
-                      {!spotifyLinked && <Navigate to="/spotify-login" />}
-                      {!picturesUploaded && <Navigate to="/upload-pictures" />}
-                    </>
-                  )
-                }
-              />
-              <Route
-                path="/SignUp"
-                element={
-                  spotifyLinked && picturesUploaded && foodsChosen ? (
-                    <Navigate to="/create-profile" />
-                  ) : (
-                    <>
-                      {!foodsChosen && <Navigate to="/food" />}
-                      {!spotifyLinked && <Navigate to="/spotify-login" />}
-                      {!picturesUploaded && <Navigate to="/upload-pictures" />}
-                    </>
-                  )
-                }
-              />
+                <Route
+                  path="/upload-pictures"
+                  element={
+                    currentUser && loadingUserData ? (
+                      <LoadingComponent />
+                    ) : spotifyLinked && picturesUploaded && foodsChosen ? (
+                      <Navigate to="/create-profile" />
+                    ) : (
+                      <UploadPictures
+                        setUserData={setUserData}
+                        setLoadingUserData={setLoadingUserData}
+                      />
+                    )
+                  }
+                />
+                <Route
+                  path="/create-profile"
+                  element={
+                    spotifyLinked && picturesUploaded && foodsChosen ? (
+                      <CreateProfilePage />
+                    ) : (
+                      <>
+                        {!foodsChosen && <Navigate to="/food" />}
+                        {!spotifyLinked && <Navigate to="/spotify-login" />}
+                        {!picturesUploaded && (
+                          <Navigate to="/upload-pictures" />
+                        )}
+                      </>
+                    )
+                  }
+                />
+                <Route
+                  path="/SignUp"
+                  element={
+                    spotifyLinked && picturesUploaded && foodsChosen ? (
+                      <Navigate to="/create-profile" />
+                    ) : (
+                      <>
+                        {!foodsChosen && <Navigate to="/food" />}
+                        {!spotifyLinked && <Navigate to="/spotify-login" />}
+                        {!picturesUploaded && (
+                          <Navigate to="/upload-pictures" />
+                        )}
+                      </>
+                    )
+                  }
+                />
 
-              <Route
-                path="/"
-                element={
-                  spotifyLinked && picturesUploaded && foodsChosen ? (
-                    <Navigate to="/matching" />
-                  ) : (
-                    <>
-                      {!foodsChosen && <Navigate to="/food" />}
-                      {!spotifyLinked && <Navigate to="/spotify-login" />}
-                      {!picturesUploaded && <Navigate to="/upload-pictures" />}
-                    </>
-                  )
-                }
-              />
+                <Route
+                  path="/"
+                  element={
+                    spotifyLinked && picturesUploaded && foodsChosen ? (
+                      <Navigate to="/matching" />
+                    ) : (
+                      <>
+                        {!foodsChosen && <Navigate to="/food" />}
+                        {!spotifyLinked && <Navigate to="/spotify-login" />}
+                        {!picturesUploaded && (
+                          <Navigate to="/upload-pictures" />
+                        )}
+                      </>
+                    )
+                  }
+                />
 
-              <Route
-                path="/matching"
-                element={
-                  spotifyLinked && picturesUploaded && foodsChosen ? (
-                    <MatchingPage />
-                  ) : (
-                    <>
-                      {!foodsChosen && <Navigate to="/food" />}
-                      {!spotifyLinked && <Navigate to="/spotify-login" />}
-                      {!picturesUploaded && <Navigate to="/upload-pictures" />}
-                    </>
-                  )
-                }
-              />
-            </>
-          )}
-        </Routes>
+                <Route
+                  path="/matching"
+                  element={
+                    spotifyLinked && picturesUploaded && foodsChosen ? (
+                      <MatchingPage />
+                    ) : (
+                      <>
+                        {!foodsChosen && <Navigate to="/food" />}
+                        {!spotifyLinked && <Navigate to="/spotify-login" />}
+                        {!picturesUploaded && (
+                          <Navigate to="/upload-pictures" />
+                        )}
+                      </>
+                    )
+                  }
+                />
+              </>
+            )}
+          </Routes>
+        </Sidebar>
       </Router>
     </div>
   );
