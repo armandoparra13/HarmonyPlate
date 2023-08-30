@@ -20,17 +20,20 @@ export const AppRoutes = () => {
   const { currentUser } = useAuth();
   const [userData, setUserData] = useState(null);
   const [loadingUserData, setLoadingUserData] = useState(true);
-
+ 
 
   useEffect(() => {
     async function fetchUserData() {
       if (currentUser) {
         try {
+          
           const response = await axios.get('/auth/fetch-user-data', {
             headers: {
               Authorization: `Bearer ${currentUser.accessToken}`,
             },
+
           });
+
           console.log(response.data);
           setUserData(response.data);
         } catch (error) {
@@ -65,6 +68,12 @@ export const AppRoutes = () => {
             <>
               <Route path="/" element={<LoginPage />} />
               <Route path="/SignUp" element={<SignUp />} />
+              <Route 
+                path="/*"
+                element={
+                  <Navigate to="/" />
+                }
+              />
             </>
           ) : (
             // Private routes
@@ -77,7 +86,8 @@ export const AppRoutes = () => {
                   spotifyLinked && picturesUploaded && foodsChosen ? (
                     <Navigate to="/create-profile" />
                   ) : (
-                    <FoodPage />
+                    <FoodPage setUserData={setUserData}
+                    setLoadingUserData={setLoadingUserData}/>
 
                   )
                 }
@@ -89,11 +99,12 @@ export const AppRoutes = () => {
                   spotifyLinked && picturesUploaded && foodsChosen ? (
                     <Navigate to="/create-profile" />
                   ) : (
-                    <SpotifyLoginPage />
+                    <SpotifyLoginPage setUserData={setUserData}
+                    setLoadingUserData={setLoadingUserData}/>
                   )
                   }
                 />
-                
+
               <Route 
                 path="/upload-pictures" 
                 element={
@@ -103,7 +114,8 @@ export const AppRoutes = () => {
                     spotifyLinked && picturesUploaded && foodsChosen ? (
                       <Navigate to="/create-profile" />
                     ) : (
-                      <UploadPictures />
+                      <UploadPictures setUserData={setUserData}
+                      setLoadingUserData={setLoadingUserData}/>
                     )
                   )
                 }

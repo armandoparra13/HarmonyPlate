@@ -315,6 +315,7 @@ app.post("/auth/foodChoice", async (req, res) => {
   })
   .then(() => {
     console.log('Adding Favorite Food succeeded');
+    //res.redirect('/create-profile');
     return res.status(200).send('Food choice submitted successfully.');
   })
   .catch((error) => {

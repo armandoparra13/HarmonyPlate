@@ -3,12 +3,31 @@ import axios from 'axios';
 import { useAuth } from '../../Auth';
 import { useNavigate } from 'react-router-dom';
 
-function UploadPictures() {
+function UploadPictures({ setUserData, setLoadingUserData  }) {
   const { currentUser } = useAuth();
   const [selectedImage, setSelectedImage] = useState(null);
   const navigate = useNavigate();
   let [description, setDescription] = useState('');
   
+
+  const fetchUserData = async () => {
+    if (currentUser) {
+      try {
+        const response = await axios.get('/auth/fetch-user-data', {
+          headers: {
+            Authorization: `Bearer ${currentUser.accessToken}`,
+          },
+        });
+        console.log(response.data);
+        setUserData(response.data);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+      finally {
+        setLoadingUserData(false);
+      }
+    }
+};
 
   const handleDescChange = (event) => {
     setDescription(event.target.value);
@@ -52,15 +71,19 @@ function UploadPictures() {
         'Content-Type': 'multipart/form-data',
         Authorization: `Bearer ${currentUser.accessToken}`,
       },
-    });
+    }).then((response) => {
+      fetchUserData();
+      console.log(response.data);
+    })
     
-    console.log(response.data);
+    
     } catch (error) {
       console.error(error);
     }
   };
   const handleNextClick = () => {
     // Navigate to a different page 
+   
     navigate("/spotify-login");
   };
 

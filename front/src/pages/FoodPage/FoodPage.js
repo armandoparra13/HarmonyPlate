@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import "./FoodPage.css"
 import { useAuth } from '../../Auth';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 
-function FoodPage() {
+function FoodPage({ setUserData, setLoadingUserData }) {
     const { currentUser } = useAuth();
     const [keyword, setKeyword] = useState('');
     const [cuisine, setCuisine] = useState('');
@@ -14,10 +14,36 @@ function FoodPage() {
     const [options, setOptions] = useState([]);
     const [optionChosen, setOptionChosen] = useState('');
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+
+
+    const fetchUserData = async () => {
+        if (currentUser) {
+          try {
+            const response = await axios.get('/auth/fetch-user-data', {
+              headers: {
+                Authorization: `Bearer ${currentUser.accessToken}`,
+              },
+            });
+            console.log(response.data);
+            setUserData(response.data);
+          } catch (error) {
+            console.error('Error fetching user data:', error);
+          }
+          finally {
+            setLoadingUserData(false);
+          }
+        }
+    };
+    
+    useEffect(() => {
+      fetchUserData(); 
+    }, [currentUser]);
 
     const onSubmit = (e) => {
         e.preventDefault();
         setOptionChosen([]);
+        
 
         fetch(`/auth/search?query=${keyword}&cuisine=${cuisine}&diet=${diet}`)
             .then((response) => {
@@ -51,16 +77,18 @@ function FoodPage() {
 
     const submitChoice = () => {
         console.log(optionChosen);
-      
-        //options.length is the issue here
+        
+     
         if ( optionChosen !== '') {
+
             console.log('hi');
-          axios.post(
+            axios.post(
             '/auth/foodChoice',
-            {
-                chosenFood: optionChosen,
-                cuisine: cuisine,
-                diet: diet
+             {
+                    chosenFood: optionChosen,
+                    cuisine: cuisine,
+                    diet: diet,
+                    foodsChosen: true
             },
             {
               headers: {
@@ -69,14 +97,19 @@ function FoodPage() {
             }
           ).then(() => {
             console.log('Food choice submitted successfully.');
+
+            fetchUserData();
             navigate('/create-profile');
-            // You might want to perform additional actions upon successful submission
+            
+
           }).catch(error => {
             console.error('Error submitting food choice:', error);
-            // Handle the error accordingly
+
           });
         }
       };
+
+     
 
     return (
         <div className="food-page">
@@ -163,7 +196,7 @@ function FoodPage() {
                         {options.map((data, i) => (
                             <button className="option" id={data.id} key={i} name={data.title} onClick={onChoose}>
                                 <div>{data.title}</div>
-                                <img className="food-img" id={data.id} src={data.image} alt=""></img>
+                                <img className="food-img" src={data.image} alt=""></img>
                             </button>
                         ))}
                     </>
@@ -171,6 +204,7 @@ function FoodPage() {
             </div>
 
             {validSearch && <button className="input-group-button" onClick={submitChoice}>Finish</button>}
+
         </div >
     );
 }
