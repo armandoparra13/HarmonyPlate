@@ -1,5 +1,5 @@
 import { AppRoutes } from './Routes';
-import { Auth } from './contexts/Auth';
+import { Auth } from './Auth';
 
 function App() {
   return (

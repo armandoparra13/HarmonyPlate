@@ -12,6 +12,7 @@ import path from 'path';
 import multer from 'multer';
 import fs from 'fs';
 import bodyParser from 'body-parser';
+import { decode } from 'punycode';
 
 
 
@@ -86,8 +87,10 @@ app.post("/auth/signup", (req, res) => {
         email: body.email,
         dateOfBirth: body.dateOfBirth,
         gender: body.gender,
+        picturesUploaded: false,
         spotifyLinked: false,
         foodsChosen: false
+        
       }).then(() => {
         return res.send("User creation successful");
       }).catch(() => {
@@ -239,26 +242,34 @@ app.get("/api", (req, res) => {
   res.json({ "users": ["userOne", "userTwo"] })
 })
 
-app.get("/auth/search", (req, res) => {
-  let query = req.query.query;
-  let cuisine = req.query.cuisine;
-  let diet = req.query.diet;
+app.get("/auth/search", async (req, res) => {
+  try {
+    const query = req.query.query;
+    const cuisine = req.query.cuisine;
+    const diet = req.query.diet;
 
-  console.log(req.query);
+    if (!query) {
+      return res.status(400).json({ error: "Invalid Query" });
+    }
 
-  if (!query) {
-    return res.status(400).send({ "error": "Invalid Query" });
+    if (!cuisine || cuisine === "") {
+      return res.status(400).json({ error: "No cuisine chosen" });
+    }
+
+    const url = `${spoonacularUrl}recipes/complexSearch?query=${query}&cuisine=${cuisine}${diet ? '&diet=' + diet : ''}&apiKey=${spoonacularApi}`;
+
+    const response = await axios.get(url);
+
+    if (response.data && response.data.results) {
+      return res.status(200).json({ options: response.data.results });
+    } else {
+      return res.status(500).json({ error: "Error fetching search results" });
+    }
+  } catch (error) {
+    console.error("Error during search:", error);
+    return res.status(500).json({ error: "An error occurred during the search" });
   }
-
-  if (!cuisine) {
-    return res.status(400).send({ "error": "No cuisine chosen" });
-  }
-  let url = `${spoonacularUrl}recipes/complexSearch?query=${query}&cuisine=${cuisine}${diet ? '&diet=' + diet : ''}&apiKey=${spoonacularApi}`
-  axios.get(url).then(response => {
-    console.log(url)
-    return res.status(200).send({ "options": response.data.results });
-  })
-})
+});
 
 app.post("/auth/foodChoice", async (req, res) => {
   // verify input is valid
@@ -268,24 +279,49 @@ app.post("/auth/foodChoice", async (req, res) => {
     !body.hasOwnProperty("chosenFood") ||
     body.chosenFood.trim() === ""
   ) {
-    return res.status(400).send("Invalid request.");
+    return res.status(400).send("No food chosen");
   }
 
-  console.log(body.chosenFood)
-  admin.auth()
-    .verifyIdToken(req.headers.authorization)
-    .then(decodedToken => {
-      update(ref(database, 'users/' + decodedToken.uid), {
-        food: { favoriteFood: body.chosenFood }
-      }).catch(() => {
-        console.log("Adding Favorite Food failed");
-        return res.status(500).send("Adding Favorite Food failure");
-      })
+  if (!body.hasOwnProperty("cuisine")) {
+    return res.status(400).json({
+      "error": "No cuisine chosen"
+    });
+  }
 
-    })
-    .catch(error => {
-      throw new Error('Error while verifying token:', error)
-    })
+  if (!body.hasOwnProperty("diet")) {
+    return res.status(400).json({
+      "error": "No diet chosen"
+    });
+  }
+
+  let food = body.chosenFood;
+  let diet = body.diet === "" ? "No preference" : body.diet;
+  let cuisine = body.cuisine;
+
+  console.log(food, diet, cuisine)
+  console.log(body.chosenFood)
+  admin
+  .auth()
+  .verifyIdToken(req.headers.authorization)
+  .then((decodedToken) => {
+    return update(ref(database, 'users/' + decodedToken.uid), {
+      food: {
+        favoriteFood: food,
+        diet: diet,
+        cuisine: cuisine
+      },
+      foodsChosen: true
+    });
+  })
+  .then(() => {
+    console.log('Adding Favorite Food succeeded');
+    //res.redirect('/create-profile');
+    return res.status(200).send('Food choice submitted successfully.');
+  })
+  .catch((error) => {
+    console.error('Error while processing food choice:', error);
+    return res.status(500).json('Food choice submission failed.');
+  });
 
 })
 
@@ -358,20 +394,20 @@ const pictureCounters = {};
 const storage = multer.diskStorage({
   destination: async (req, file, cb) => {
     try {
-        const token = req.headers.authorization?.split(' ')[1];
-        const decodedToken = await admin.auth().verifyIdToken(token);
+      const token = req.headers.authorization?.split(' ')[1];
+      const decodedToken = await admin.auth().verifyIdToken(token);
         
-        const userID = decodedToken.uid; 
+      const userID = decodedToken.uid; 
 
         
-        const userFolderPath = path.join('../front/public/uploads', userID);
-        fs.mkdirSync(userFolderPath, { recursive: true });
+      const userFolderPath = path.join('../front/public/uploads', userID);
+      fs.mkdirSync(userFolderPath, { recursive: true });
 
         //req.decodedToken = decodedToken;
 
-        cb(null, userFolderPath);
+      cb(null, userFolderPath);
     } catch (error) {
-        cb(error);
+      cb(error);
     }
 },
   filename: async (req, file, cb) => {
@@ -403,9 +439,67 @@ const upload = multer({ storage });
 // Route to handle image upload
 app.post('/auth/upload', upload.single('image'), (req, res) => {
   if (req.file) {
-      res.json({ imageUrl: '/uploads/${req.file.filename}' });
+    res.json({ imageUrl: '/uploads/${req.file.filename}' });
+    const idToken = req.headers.authorization?.replace('Bearer ', '');
+    admin.auth()
+    .verifyIdToken(idToken)
+    .then(decodedToken => {
+      update(ref(database, 'users/' + decodedToken.uid), {
+        picturesUploaded: true
+  
+      }).catch(() => {
+                
+        return res.status(500).send("Adding picture failure");
+      })
+        
+    })
+    .catch(error => {
+      throw new Error('Error while verifying token:', error)
+    })
   } else {
       res.status(400).json({ message: 'No file uploaded' });
+  }
+});
+
+async function fetchUserData(req, res, next) {
+  const idToken = req.headers.authorization?.replace('Bearer ', '');
+
+  try {
+    if (idToken) {
+      const decodedToken = await admin.auth().verifyIdToken( idToken);
+      const uid = decodedToken.uid;
+      const userRef = admin.database().ref(`/users/${uid}`);
+      userRef.once('value', (snapshot) => {
+        const userData = snapshot.val();
+        if (userData) {
+          const spotifyLinked = userData.spotifyLinked || false;
+          const foodsChosen = userData.foodsChosen || false;
+          const picturesUploaded = userData.picturesUploaded || false;
+
+          req.userData = {
+            picturesUploaded,
+            spotifyLinked,
+            foodsChosen,
+          };
+          next();
+        
+        } else {
+          console.log('User data not found');
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Error verifying ID token:', error);
+  }
+
+ 
+}
+
+app.get('/auth/fetch-user-data', fetchUserData, (req, res) => {
+  if (req.userData) {
+    res.json(req.userData);
+  } else {
+    res.status(401).json({ error: 'Unauthorized' });
   }
 });
 

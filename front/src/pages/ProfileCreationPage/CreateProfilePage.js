@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAuth } from '../../contexts/Auth'
+import { useAuth } from '../../Auth'
 import { useNavigate } from 'react-router-dom';
 
 /*
