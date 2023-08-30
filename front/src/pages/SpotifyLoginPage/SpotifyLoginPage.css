@@ -17,3 +17,10 @@
     border-color: #1db954;
     color: #1db954;
 }
+
+.Spotify-container{
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+}

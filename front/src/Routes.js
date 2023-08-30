@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import LoginPage from './pages/LoginPage/LoginPage';
 import { MatchingPage } from './pages/MatchingPage/MatchingPage';
-import CreateProfilePage from './pages/ProfileCreationPage/CreateProfilePage';
 import SignUp from './pages/SignUpPage/SignUpPage';
 import FoodPage from './pages/FoodPage/FoodPage';
 import SpotifyLoginPage from './pages/SpotifyLoginPage/SpotifyLoginPage';
@@ -10,13 +9,12 @@ import SpotifySuccessPage from './pages/SpotifyLoginPage/SpotifySuccessPage';
 import UploadPictures from './pages/ProfileCreationPage/UploadPictures';
 import { useAuth } from './Auth';
 import axios from 'axios';
-
+import Sidebar from './components/Sidebar/Sidebar';
+import HomePage from './pages/HomePage/HomePage';
 
 const LoadingComponent = () => {
   return <div>Loading...</div>;
 };
-import Sidebar from './components/Sidebar/Sidebar';
-import HomePage from './pages/HomePage/HomePage';
 
 export const AppRoutes = () => {
   const { currentUser } = useAuth();
@@ -127,7 +125,7 @@ export const AppRoutes = () => {
                   path="/create-profile"
                   element={
                     spotifyLinked && picturesUploaded && foodsChosen ? (
-                      <CreateProfilePage />
+                      <HomePage />
                     ) : (
                       <>
                         {!foodsChosen && <Navigate to="/food" />}
