@@ -412,3 +412,23 @@ app.post('/auth/upload', upload.single('image'), (req, res) => {
 app.listen(port, hostname, () => {
   console.log(`http://${hostname}:${port}`);
 })
+
+// Get info for user's profile
+app.get("/auth/getUserProfile", (req, res) => {
+  admin.auth()
+    .verifyIdToken(req.headers.authorization)
+    .then(decodedToken => {
+      const userRef = ref(database, 'users/' + decodedToken.uid);
+
+      onValue(userRef, (snapshot) => {
+        const userData = snapshot.val();
+        res.status(200).json(userData);
+      }, {
+        onlyOnce: true
+      });
+    })
+    .catch(error => {
+      console.error('Error while verifying token:', error);
+      res.status(500).send("Error while retrieving user profile");
+    });
+});

@@ -9,6 +9,7 @@ import FoodPage from './pages/FoodPage/FoodPage';
 import SpotifyLoginPage from './pages/SpotifyLoginPage/SpotifyLoginPage';
 import SpotifySuccessPage from './pages/SpotifyLoginPage/SpotifySuccessPage';
 import UploadPictures from './pages/ProfileCreationPage/UploadPictures';
+import UserProfilePage from './pages/UserProfilePage/UserProfilePage';
 
 export const AppRoutes = () => {
 
@@ -44,6 +45,8 @@ export const AppRoutes = () => {
         <Route path="/create-profile" element={<CreateProfilePage />} />
         <Route path="/SignUp" element={<SignUp />} />
         <Route path="/food" element={<FoodPage />} />
+
+        <Route path="/user-profile" element={<UserProfilePage/>} />
       </Routes>
     </Router>
     </div>
