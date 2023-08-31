@@ -15,6 +15,7 @@ node_modules
 env_frontend.json
 env_backend.json
 serviceAccount.json
+.DS_Store
 
 npm-debug.log*
 yarn-debug.log*
