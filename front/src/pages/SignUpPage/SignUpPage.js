@@ -11,7 +11,7 @@ const SignUp = () => {
         dob: '',
         password: '',
         confirmPassword: '',
-        gender: 'Select'
+        gender: 'Male'
     });
     const [errorMessage, setErrorMessage] = useState("");  // New error state
     
