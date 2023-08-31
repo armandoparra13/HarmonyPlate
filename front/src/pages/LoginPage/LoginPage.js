@@ -48,7 +48,7 @@ function LoginPage() {
   }
 
   return (
-    <div>
+    <div className="loginContainer">
       <img className="bg-img" src="https://media.giphy.com/media/h7uTwqEHysbd2lhyDP/giphy.gif" />
 
       <div className="card">

@@ -6,7 +6,7 @@ const HomePage = () => {
 
     return (
         <div className="home-container">
-            <div className={`navbar ${navOpen ? 'open' : ''}`}>
+            {/* <div className={`navbar ${navOpen ? 'open' : ''}`}>
                 <button className="toggle-nav" onClick={() => setNavOpen(!navOpen)}>
                     {navOpen ? 'Close' : 'Open'}
                 </button>
@@ -15,7 +15,7 @@ const HomePage = () => {
                 <button>Matches</button>
                 <button>Settings</button>
                 <button>Sign Out</button>
-            </div>
+            </div> */}
             <div className="main-content">
                 <div className="match-box">
                     {/* Display potential match details here */}
