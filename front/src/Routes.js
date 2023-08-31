@@ -23,7 +23,10 @@ const LoadingComponent = () => {
   return <div>Loading...</div>;
 };
 
-const socket = io.connect('http://localhost:5000');
+const socket = io.connect('http://localhost:3000', {
+  transports: ['websocket'],
+  withCredentials: true,
+});
 
 export const AppRoutes = () => {
   const { currentUser } = useAuth();

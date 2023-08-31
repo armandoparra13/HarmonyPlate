@@ -58,9 +58,11 @@ const port = 5000;
 const hostname = 'localhost';
 
 //setting up chats
-const socketIO = require('socket.io')(http, {
+const socketIO = require('socket.io')(httpServer, {
   cors: {
     origin: 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+    credentials: true,
   },
 });
 
@@ -100,8 +102,8 @@ app.post('/saveChat', (req, res) => {
         senderID: body.senderID,
         message: body.message,
       }).catch(() => {
-        console.log('Adding Favorite Food failed');
-        return res.status(500).send('Adding Favorite Food failure');
+        console.log('Adding New Message failed');
+        return res.status(500).send('Adding New Message failure');
       });
     })
     .catch((error) => {

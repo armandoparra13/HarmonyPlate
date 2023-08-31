@@ -22,6 +22,7 @@
     "concurrently": "^8.2.0"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "firebase": "^10.1.0",
     "firebase-admin": "^11.10.1",
     "react-router-dom": "^6.15.0",

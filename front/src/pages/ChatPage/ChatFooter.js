@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ref, push } from 'firebase/database';
 
 const ChatFooter = ({ socket }) => {
   const [message, setMessage] = useState('');
@@ -16,6 +17,7 @@ const ChatFooter = ({ socket }) => {
         socketID: socket.id,
       });
     }
+    //push(ref(database, 'messages'), message);
     setMessage('');
   };
   return (
