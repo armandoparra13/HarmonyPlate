@@ -8,6 +8,7 @@ import FoodPage from './pages/FoodPage/FoodPage';
 import SpotifyLoginPage from './pages/SpotifyLoginPage/SpotifyLoginPage';
 import SpotifySuccessPage from './pages/SpotifyLoginPage/SpotifySuccessPage';
 import UploadPictures from './pages/ProfileCreationPage/UploadPictures';
+import HomePage from './pages/HomePage/HomePage';
 import { useAuth } from './Auth';
 import axios from 'axios';
 
@@ -84,7 +85,7 @@ export const AppRoutes = () => {
                 path="/food" 
                 element={
                   spotifyLinked && picturesUploaded && foodsChosen ? (
-                    <Navigate to="/create-profile" />
+                    <Navigate to="/homepage" />
                   ) : (
                     <FoodPage setUserData={setUserData}
                     setLoadingUserData={setLoadingUserData}/>
@@ -97,7 +98,7 @@ export const AppRoutes = () => {
                 path="/spotify-login" 
                 element={
                   spotifyLinked && picturesUploaded && foodsChosen ? (
-                    <Navigate to="/create-profile" />
+                    <Navigate to="/homepage" />
                   ) : (
                     <SpotifyLoginPage setUserData={setUserData}
                     setLoadingUserData={setLoadingUserData}/>
@@ -108,23 +109,21 @@ export const AppRoutes = () => {
               <Route 
                 path="/upload-pictures" 
                 element={
-                  currentUser && loadingUserData ? (
-                    <LoadingComponent />
-                  ) : (
+                
                     spotifyLinked && picturesUploaded && foodsChosen ? (
-                      <Navigate to="/create-profile" />
+                      <Navigate to="/homepage" />
                     ) : (
                       <UploadPictures setUserData={setUserData}
                       setLoadingUserData={setLoadingUserData}/>
                     )
-                  )
+                  
                 }
               />
               <Route 
-                path="/create-profile" 
+                path="/homepage" 
                 element={
                   spotifyLinked && picturesUploaded && foodsChosen ? (
-                    <CreateProfilePage />
+                    <HomePage />
                   ) : (
                     <>
                       {!foodsChosen && <Navigate to="/food" />}
@@ -138,7 +137,7 @@ export const AppRoutes = () => {
                 path="/SignUp"
                 element={
                   spotifyLinked && picturesUploaded && foodsChosen ? (
-                    <Navigate to="/create-profile" />
+                    <Navigate to="/homepage" />
                   ) : (
                     <>
                       {!foodsChosen && <Navigate to="/food" />}
