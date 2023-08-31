@@ -81,7 +81,7 @@ export const AppRoutes = () => {
                   path="/food"
                   element={
                     spotifyLinked && picturesUploaded && foodsChosen ? (
-                      <Navigate to="/create-profile" />
+                      <Navigate to="/homepage" />
                     ) : (
                       <FoodPage
                         setUserData={setUserData}
@@ -95,7 +95,7 @@ export const AppRoutes = () => {
                   path="/spotify-login"
                   element={
                     spotifyLinked && picturesUploaded && foodsChosen ? (
-                      <Navigate to="/create-profile" />
+                      <Navigate to="/homepage" />
                     ) : (
                       <SpotifyLoginPage
                         setUserData={setUserData}
@@ -112,6 +112,8 @@ export const AppRoutes = () => {
                       <LoadingComponent />
                     ) : spotifyLinked && picturesUploaded && foodsChosen ? (
                       <Navigate to="/create-profile" />
+                    ) : spotifyLinked && picturesUploaded && foodsChosen ? (
+                      <Navigate to="/homepage" />
                     ) : (
                       <UploadPictures
                         setUserData={setUserData}
@@ -121,7 +123,7 @@ export const AppRoutes = () => {
                   }
                 />
                 <Route
-                  path="/create-profile"
+                  path="/homepage"
                   element={
                     spotifyLinked && picturesUploaded && foodsChosen ? (
                       <HomePage />
@@ -140,7 +142,7 @@ export const AppRoutes = () => {
                   path="/SignUp"
                   element={
                     spotifyLinked && picturesUploaded && foodsChosen ? (
-                      <Navigate to="/create-profile" />
+                      <Navigate to="/homepage" />
                     ) : (
                       <>
                         {!foodsChosen && <Navigate to="/food" />}
@@ -157,7 +159,7 @@ export const AppRoutes = () => {
                   path="/"
                   element={
                     spotifyLinked && picturesUploaded && foodsChosen ? (
-                      <Navigate to="/matching" />
+                      <Navigate to="/homepage" />
                     ) : (
                       <>
                         {!foodsChosen && <Navigate to="/food" />}
