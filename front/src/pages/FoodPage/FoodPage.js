@@ -19,31 +19,31 @@ function FoodPage({ setUserData, setLoadingUserData }) {
 
     const fetchUserData = async () => {
         if (currentUser) {
-          try {
-            const response = await axios.get('/auth/fetch-user-data', {
-              headers: {
-                Authorization: `Bearer ${currentUser.accessToken}`,
-              },
-            });
-            console.log(response.data);
-            setUserData(response.data);
-          } catch (error) {
-            console.error('Error fetching user data:', error);
-          }
-          finally {
-            setLoadingUserData(false);
-          }
+            try {
+                const response = await axios.get('/auth/fetch-user-data', {
+                    headers: {
+                        Authorization: `Bearer ${currentUser.accessToken}`,
+                    },
+                });
+                console.log(response.data);
+                setUserData(response.data);
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+            finally {
+                setLoadingUserData(false);
+            }
         }
     };
-    
+
     useEffect(() => {
-      fetchUserData(); 
+        fetchUserData();
     }, [currentUser]);
 
     const onSubmit = (e) => {
         e.preventDefault();
         setOptionChosen([]);
-        
+
 
         fetch(`/auth/search?query=${keyword}&cuisine=${cuisine}&diet=${diet}`)
             .then((response) => {
@@ -77,39 +77,39 @@ function FoodPage({ setUserData, setLoadingUserData }) {
 
     const submitChoice = () => {
         console.log(optionChosen);
-        
-     
-        if ( optionChosen !== '') {
+
+
+        if (optionChosen !== '') {
 
             console.log('hi');
             axios.post(
-            '/auth/foodChoice',
-             {
+                '/auth/foodChoice',
+                {
                     chosenFood: optionChosen,
                     cuisine: cuisine,
                     diet: diet,
                     foodsChosen: true
-            },
-            {
-              headers: {
-                authorization: currentUser.accessToken,
-              },
-            }
-          ).then(() => {
-            console.log('Food choice submitted successfully.');
+                },
+                {
+                    headers: {
+                        authorization: currentUser.accessToken,
+                    },
+                }
+            ).then(() => {
+                console.log('Food choice submitted successfully.');
 
-            fetchUserData();
-            navigate('/create-profile');
-            
+                fetchUserData();
+                navigate('/create-profile');
 
-          }).catch(error => {
-            console.error('Error submitting food choice:', error);
 
-          });
+            }).catch(error => {
+                console.error('Error submitting food choice:', error);
+
+            });
         }
-      };
+    };
 
-     
+
 
     return (
         <div className="food-page">
@@ -167,7 +167,7 @@ function FoodPage({ setUserData, setLoadingUserData }) {
             <div className="input-group">
                 <label>Choose a diet (or you can leave it blank):</label>
                 <select
-                    className="custom-select"
+                    className="custom-food-select"
                     name="diet"
                     onClick={(e) => (
                         setDiet(e.target.value))}

@@ -390,6 +390,13 @@ app.post('/auth/submit-desc', async (req, res) => {
 
 const pictureCounters = {};
 
+function setRandomString(req, res, next) {
+  // Generate the random string and set it in req.randomString
+  req.randomString = generateRandomString(10);
+  console.log('Random String:', req.randomString); // For debugging, log the random string
+  next(); // Call next() to proceed to the next middleware
+}
+
 //UPLOAD PICTURES
 const storage = multer.diskStorage({
   destination: async (req, file, cb) => {
@@ -398,9 +405,10 @@ const storage = multer.diskStorage({
       const decodedToken = await admin.auth().verifyIdToken(token);
         
       const userID = decodedToken.uid; 
-
+      req.randomString = generateRandomString(10);
+      console.log(req.randomString);
         
-      const userFolderPath = path.join('../front/public/uploads', userID);
+      const userFolderPath = path.join('../front/public/uploads', req.randomString);
       fs.mkdirSync(userFolderPath, { recursive: true });
 
         //req.decodedToken = decodedToken;
@@ -416,15 +424,14 @@ const storage = multer.diskStorage({
       const token = req.headers.authorization?.split(' ')[1];
       const decodedToken = await admin.auth().verifyIdToken(token);
       const userID = decodedToken.uid; 
-      //console.log(userID);
-      //console.log(token);
-
-      const pictureNumber = pictureCounters[userID] || 0; // Get the picture number for the user
+      const randomString = req.randomString;
+      console.log(randomString);
+      const pictureNumber = pictureCounters[randomString] || 0; // Get the picture number for the user
 
       // Increment the picture counter for the user
-      pictureCounters[userID] = pictureNumber + 1;
+      pictureCounters[randomString] = pictureNumber + 1;
 
-      const uniqueFilename = `${userID}_${pictureNumber}${fileExtension}`;
+      const uniqueFilename = `${randomString}_${pictureNumber}${fileExtension}`;
 
       cb(null, uniqueFilename);
   } catch (error) {
@@ -439,12 +446,15 @@ const upload = multer({ storage });
 // Route to handle image upload
 app.post('/auth/upload', upload.single('image'), (req, res) => {
   if (req.file) {
-    res.json({ imageUrl: '/uploads/${req.file.filename}' });
+    res.json({ imageUrl: 'public/uploads/${req.file.filename}' });
+    const randomString = req.randomString;
+    console.log(randomString);
     const idToken = req.headers.authorization?.replace('Bearer ', '');
     admin.auth()
     .verifyIdToken(idToken)
     .then(decodedToken => {
       update(ref(database, 'users/' + decodedToken.uid), {
+        randomString: randomString,
         picturesUploaded: true
   
       }).catch(() => {
