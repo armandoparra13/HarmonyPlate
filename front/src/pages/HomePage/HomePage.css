@@ -54,14 +54,17 @@
 }
 
 .match-card-image {
-    width: 100%;
+    width: 70%;
     height: auto;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
+    border-radius: 30px;
 }
 
 .match-card-content {
-    padding: 16px;
+    padding: 12px;
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center;
+    display: flex;
 }
 
 .match-card-title {

@@ -64,13 +64,9 @@ const HomePage = () => {
     return matches.length !== 0 ? (
         <div className="main-content">
             <div className="match-box">
-                <p>Potential Match Details</p>
-
-                {/* {matches.map((data, i) => ( */}
                 <div className="match-card" key={currentMatchIndex}>
                     <button className="like-btn" onClick={handleLike}>Like</button>
                     <div className="match-info">
-                        <img src={`images/pw4jJaaOv5YJFYnUCCXhB3RaoXt2/pw4jJaaOv5YJFYnUCCXhB3RaoXt2.png`} alt="1" className="card-image" />
                         <div className="match-card-content">
                             <h2 className="match-card-title">{matches[currentMatchIndex].name}</h2>
                             <p className="match-card-description">{matches[currentMatchIndex].description}y</p>
