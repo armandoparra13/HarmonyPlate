@@ -1,6 +1,6 @@
 import express from 'express';
 import { initializeApp } from 'firebase/app';
-import { getDatabase, limitToFirst, ref, set, update, query, orderByKey, onValue, child} from "firebase/database";
+import { getDatabase, limitToFirst, ref, set, update, query, orderByKey, onValue, get} from "firebase/database";
 import env from './env_backend.json' assert { type: 'json' };
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import axios from 'axios';
@@ -82,6 +82,9 @@ app.post("/auth/signup", (req, res) => {
       // Signed in 
       //add user to Realtime Database (used to store user data other than login info)
       let user = userCredential.user;
+
+      let randomString = generateRandomString(10);
+
       set(ref(database, 'users/' + user.uid), {
         username: body.username,
         email: body.email,
@@ -89,7 +92,8 @@ app.post("/auth/signup", (req, res) => {
         gender: body.gender,
         picturesUploaded: false,
         spotifyLinked: false,
-        foodsChosen: false
+        foodsChosen: false,
+        randomString: randomString
         
       }).then(() => {
         return res.send("User creation successful");
@@ -390,25 +394,58 @@ app.post('/auth/submit-desc', async (req, res) => {
 
 const pictureCounters = {};
 
-function setRandomString(req, res, next) {
-  // Generate the random string and set it in req.randomString
-  req.randomString = generateRandomString(10);
-  console.log('Random String:', req.randomString); // For debugging, log the random string
-  next(); // Call next() to proceed to the next middleware
+async function getUserRandomString(req) {
+  const token = req.headers.authorization?.split(' ')[1];
+  
+
+  try {
+    if(token) {
+      const decodedToken = await admin.auth().verifyIdToken(token);
+
+      const uid = decodedToken.uid;
+      const userRef = admin.database().ref(`/users/${uid}`);
+
+      const snapshot = await userRef.once('value');
+      const userData = snapshot.val();
+
+      if (userData && userData.randomString) {
+        return userData.randomString;
+
+      
+        
+        
+      } else {
+          console.log('User data not found');
+          return null;
+      }
+    }
+    
+  } catch (error) {
+    console.error('Error verifying ID token:', error);
+    return null;
+  }
+    
+
+  
 }
 
 //UPLOAD PICTURES
 const storage = multer.diskStorage({
   destination: async (req, file, cb) => {
     try {
+      const userRandomString = await getUserRandomString(req);
+      console.log(userRandomString);
       const token = req.headers.authorization?.split(' ')[1];
       const decodedToken = await admin.auth().verifyIdToken(token);
         
       const userID = decodedToken.uid; 
-      req.randomString = generateRandomString(10);
-      console.log(req.randomString);
+      const userRef = ref(database, 'users/' + userID);
+      const userSnapshot = await get(userRef);
+      const user = userSnapshot.val();
+
+      
         
-      const userFolderPath = path.join('../front/public/uploads', req.randomString);
+      const userFolderPath = path.join('../front/public/uploads', userRandomString);
       fs.mkdirSync(userFolderPath, { recursive: true });
 
         //req.decodedToken = decodedToken;
@@ -420,18 +457,16 @@ const storage = multer.diskStorage({
 },
   filename: async (req, file, cb) => {
     try {
+      const userRandomString = await getUserRandomString(req);
       const fileExtension = path.extname(file.originalname);
-      const token = req.headers.authorization?.split(' ')[1];
-      const decodedToken = await admin.auth().verifyIdToken(token);
-      const userID = decodedToken.uid; 
-      const randomString = req.randomString;
-      console.log(randomString);
-      const pictureNumber = pictureCounters[randomString] || 0; // Get the picture number for the user
+      
 
-      // Increment the picture counter for the user
-      pictureCounters[randomString] = pictureNumber + 1;
+      console.log('User Random String:', userRandomString);
+      const pictureNumber = pictureCounters[userRandomString] || 0; // Get the picture number for the user
+      
+      pictureCounters[userRandomString] = pictureNumber + 1;
 
-      const uniqueFilename = `${randomString}_${pictureNumber}${fileExtension}`;
+      const uniqueFilename = `${userRandomString}_${pictureNumber}${fileExtension}`;
 
       cb(null, uniqueFilename);
   } catch (error) {
@@ -446,15 +481,14 @@ const upload = multer({ storage });
 // Route to handle image upload
 app.post('/auth/upload', upload.single('image'), (req, res) => {
   if (req.file) {
-    res.json({ imageUrl: 'public/uploads/${req.file.filename}' });
-    const randomString = req.randomString;
-    console.log(randomString);
+    //res.json({ imageUrl: 'public/uploads/${req.file.filename}' });
+   
     const idToken = req.headers.authorization?.replace('Bearer ', '');
     admin.auth()
     .verifyIdToken(idToken)
     .then(decodedToken => {
       update(ref(database, 'users/' + decodedToken.uid), {
-        randomString: randomString,
+
         picturesUploaded: true
   
       }).catch(() => {
