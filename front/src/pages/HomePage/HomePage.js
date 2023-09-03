@@ -12,6 +12,11 @@ const HomePage = () => {
     const fetchUserData = async () => {
         if (currentUser) {
             try {
+                const response = await axios.get('/auth/getMatchesInfo', {
+                    headers: {
+                        Authorization: currentUser.accessToken,
+                    },
+                });
                 if (matches) {
                     try {
                         await axios.get('/auth/getMatches',
@@ -24,11 +29,6 @@ const HomePage = () => {
                         console.error('Error updating pool:', error);
                     }
                 }
-                const response = await axios.get('/auth/getMatchesInfo', {
-                    headers: {
-                        Authorization: currentUser.accessToken,
-                    },
-                });
                 setMatches(matches.concat(response.data))
             } catch (error) {
                 console.error('Error fetching matches data:', error);
@@ -68,6 +68,7 @@ const HomePage = () => {
                     <button className="like-btn" onClick={handleLike}>Like</button>
                     <div className="match-info">
                         <div className="match-card-content">
+                            {/* <img src="/uploads/PQ5oYgHbPd/PQ5oYgHbPd_1.png" className="match-card-image" /> */}
                             <h2 className="match-card-title">{matches[currentMatchIndex].name}</h2>
                             <p className="match-card-description">{matches[currentMatchIndex].description}y</p>
                             <p className="match-card-food">Favorite Cuisine: {matches[currentMatchIndex].cuisine}</p>
