@@ -94,7 +94,6 @@ export const AppRoutes = () => {
                     )
                   }
                 />
-
                 <Route
                   path="/spotify-login"
                   element={
@@ -108,7 +107,6 @@ export const AppRoutes = () => {
                     )
                   }
                 />
-
                 <Route
                   path="/upload-pictures"
                   element={
@@ -140,7 +138,7 @@ export const AppRoutes = () => {
                     )
                   }
                 />
-                <Route path="/chats" element={<ChatPage socket={socket} />} />
+                <Route path="/chats" element={<ChatPage socket={socket} />} />{' '}
                 <Route
                   path="/SignUp"
                   element={
@@ -157,7 +155,6 @@ export const AppRoutes = () => {
                     )
                   }
                 />
-
                 <Route
                   path="/"
                   element={
@@ -174,7 +171,6 @@ export const AppRoutes = () => {
                     )
                   }
                 />
-
                 <Route
                   path="/matching"
                   element={

@@ -22,12 +22,15 @@ import path from 'path';
 import multer from 'multer';
 import fs from 'fs';
 import bodyParser from 'body-parser';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 import { decode } from 'punycode';
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(bodyParser.json());
+const httpServer = createServer();
 
 let api_key = env['apiKey'];
 let domain = env['authDomain'];
@@ -519,16 +522,14 @@ app.get('/auth/fetch-user-data', fetchUserData, (req, res) => {
 });
 
 //CHATS
-const socketIO = require('socket.io')(httpServer, {
+const socketIO = new Server(httpServer, {
   cors: {
     origin: 'http://localhost:3000',
     methods: ['GET', 'POST'],
     credentials: true,
   },
 });
-io.use((socket, next) => {
-  VerifySocketToken(socket, next);
-});
+
 socketIO.on('connection', (socket) => {
   console.log(`⚡: ${socket.id} user just connected!`);
 
