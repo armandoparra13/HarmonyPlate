@@ -428,7 +428,7 @@ const storage = multer.diskStorage({
   destination: async (req, file, cb) => {
     try {
       const userRandomString = await getUserRandomString(req);
-      console.log(userRandomString);
+
       const token = req.headers.authorization?.split(' ')[1];
       const decodedToken = await admin.auth().verifyIdToken(token);
         
@@ -442,8 +442,6 @@ const storage = multer.diskStorage({
       fs.mkdirSync(userFolderPath, { recursive: true });
 
         //req.decodedToken = decodedToken;
-
-    
       cb(null, userFolderPath);
     } catch (error) {
       cb(error);
@@ -453,9 +451,8 @@ const storage = multer.diskStorage({
     try {
       const userRandomString = await getUserRandomString(req);
       const fileExtension = path.extname(file.originalname);
-      
-
-      console.log('User Random String:', userRandomString);
+  
+      //console.log('User Random String:', userRandomString);
       const pictureNumber = pictureCounters[userRandomString] || 0; // Get the picture number for the user
 
       pictureCounters[userRandomString] = pictureNumber + 1;
@@ -475,19 +472,16 @@ const upload = multer({ storage });
 // Route to handle image upload
 app.post('/auth/upload', upload.single('image'), (req, res) => {
   if (req.file) {
-    // Check if the file was uploaded successfully
     console.log('File uploaded:', req.file);
 
     const idToken = req.headers.authorization?.replace('Bearer ', '');
     
-    // Verify the user's ID token
     admin.auth()
       .verifyIdToken(idToken)
       .then(async (decodedToken) => {
         const userID = decodedToken.uid;
         const userRef = ref(database, 'users/' + userID);
-        
-        // Fetch user data
+     
         const userSnapshot = await get(userRef);
         const userData = userSnapshot.val();
         console.log("pictures:", userData);
@@ -502,7 +496,7 @@ app.post('/auth/upload', upload.single('image'), (req, res) => {
             picturesUploaded: newCount
           })
             .then(() => {
-              // Respond with the updated picture count
+             
               return res.json({ picturesUploaded: newCount });
             })
             .catch((error) => {
