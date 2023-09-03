@@ -1,5 +1,5 @@
 import { AppRoutes } from './Routes';
-import { Auth } from './Auth';
+import { Auth } from './contexts/Auth';
 
 function App() {
   return (
@@ -10,4 +10,3 @@ function App() {
 }
 
 export default App;
-

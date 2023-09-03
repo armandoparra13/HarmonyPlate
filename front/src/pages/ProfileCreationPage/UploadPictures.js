@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useAuth } from '../../Auth';
+import { useAuth } from '../../contexts/Auth';
 import { useNavigate } from 'react-router-dom';
-import './UploadPictures.css'
+import './UploadPictures.css';
 
 function UploadPictures({ setUserData, setLoadingUserData }) {
   const { currentUser } = useAuth();
   const [selectedImage, setSelectedImage] = useState(null);
   const navigate = useNavigate();
   let [description, setDescription] = useState('');
-
 
   const fetchUserData = async () => {
     if (currentUser) {
@@ -23,8 +22,7 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
         setUserData(response.data);
       } catch (error) {
         console.error('Error fetching user data:', error);
-      }
-      finally {
+      } finally {
         setLoadingUserData(false);
       }
     }
@@ -32,7 +30,7 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
 
   const handleDescChange = (event) => {
     setDescription(event.target.value);
-  }
+  };
 
   const handleDescSubmit = async (event) => {
     try {
@@ -50,16 +48,13 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
     } catch (error) {
       console.error('Error while submitting description:', error.message);
     }
-  }
-
+  };
 
   const handleImageChange = (event) => {
     setSelectedImage(event.target.files[0]);
   };
 
   const handleImageUpload = async () => {
-
-
     if (!selectedImage || !currentUser) {
       return;
     }
@@ -67,25 +62,25 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
     formData.append('image', selectedImage);
 
     try {
-      const response = await axios.post('/auth/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${currentUser.accessToken}`,
-        },
-      }).then((response) => {
-        fetchUserData();
-        console.log(response.data);
-      })
-
-
+      const response = await axios
+        .post('/auth/upload', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${currentUser.accessToken}`,
+          },
+        })
+        .then((response) => {
+          fetchUserData();
+          console.log(response.data);
+        });
     } catch (error) {
       console.error(error);
     }
   };
   const handleNextClick = () => {
-    // Navigate to a different page 
+    // Navigate to a different page
 
-    navigate("/spotify-login");
+    navigate('/spotify-login');
   };
 
   return (
