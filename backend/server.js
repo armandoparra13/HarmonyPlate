@@ -405,8 +405,6 @@ async function getUserRandomString(req) {
       if (userData && userData.randomString) {
         return userData.randomString;
 
-      
-        
         
       } else {
           console.log('User data not found');
@@ -495,10 +493,7 @@ app.post('/auth/upload', upload.single('image'), (req, res) => {
           update(ref(database, 'users/' + decodedToken.uid), {
             picturesUploaded: newCount
           })
-            .then(() => {
-             
-              return res.json({ picturesUploaded: newCount });
-            })
+           
             .catch((error) => {
               console.error('Error updating picture count:', error);
               return res.status(500).send("Adding picture failure");
