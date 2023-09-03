@@ -6,23 +6,42 @@ import './UploadPictures.css'
 
 function UploadPictures({ setUserData, setLoadingUserData }) {
   const { currentUser } = useAuth();
-  const [selectedImage1, setSelectedImage1] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
   const [selectedImage2, setSelectedImage2] = useState(null);
   const [selectedImage3, setSelectedImage3] = useState(null);
   const navigate = useNavigate();
   let [description, setDescription] = useState('');
   const [uploadedPicturesCount, setUploadedPicturesCount] = useState(0); 
-  const [uploading1, setUploading1] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [uploading2, setUploading2] = useState(false);
   const [uploading3, setUploading3] = useState(false);
   const [imagePlaceholders, setImagePlaceholders] = useState([]);
+  const [imageUrls, setImageUrls] = useState([]);
 
   useEffect(() => {
     // Fetch initial value for uploadedPicturesCount when the component mounts
     fetchUserData();
-  }, [uploading1, uploading2, uploading3]);
+    fetchUserImages();
+  }, [uploading]);
 
-  
+  const fetchUserImages = async () => {
+    try {
+      const response = await axios.get('/auth/fetch-user-images', {
+        headers: {
+          Authorization: `Bearer ${currentUser.accessToken}`,
+        },
+      });
+      if (response.data) {
+        setImageUrls(response.data.imageUrls);
+        console.log(response.data.imageUrls);
+      }
+      
+    } catch (error) {
+      console.error('Error fetching user images:', error);
+    }
+  };
+
+
 
   const fetchUserData = async () => {
     if (currentUser) {
@@ -75,29 +94,24 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
   }
 
 
-  const handleImageChange1 = (event) => {
-    setSelectedImage1(event.target.files[0]);
+  const handleImageChange = (event) => {
+    setSelectedImage(event.target.files[0]);
   };
 
-  const handleImageChange2 = (event) => {
-    setSelectedImage2(event.target.files[0]);
-  };
-  const handleImageChange3 = (event) => {
-    setSelectedImage2(event.target.files[0]);
-  };
 
-  const handleImageUpload1 = async () => {
+
+  const handleImageUpload = async () => {
     console.log("handleImageUpload1 clicked");
 
-    if (!selectedImage1 || !currentUser) {
+    if (!selectedImage || !currentUser) {
       return;
     }
     console.log("handleImageUpload1 clicked");
   
     console.log('yuh');
-    setUploading1(true);
+    setUploading(true);
     const formData = new FormData();
-    formData.append('image', selectedImage1);
+    formData.append('image', selectedImage);
   
 
     try {
@@ -115,71 +129,11 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
     } catch (error) {
       console.error(error);
     } finally {
-      setUploading1(false);
+      setUploading(false);
     }
   };
 
-  const handleImageUpload2 = async () => {
-
-
-    if (!selectedImage2 || !currentUser) {
-      return;
-    }
-   
-    setUploading2(true);
-    const formData = new FormData();
-    formData.append('image', selectedImage2);
-  
-
-    try {
-      const response = await axios.post('/auth/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${currentUser.accessToken}`,
-        },
-      });
-
-      const updatedPicCount = response.data.picturesCount;
-      fetchUserData();
-
-
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setUploading2(false);
-    }
-  };
-
-  const handleImageUpload3 = async () => {
-
-
-    if (!selectedImage3 || !currentUser) {
-      return;
-    }
-   
-    setUploading3(true);
-    const formData = new FormData();
-    formData.append('image', selectedImage3);
-  
-
-    try {
-      const response = await axios.post('/auth/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${currentUser.accessToken}`,
-        },
-      });
-
-      const updatedPicCount = response.data.picturesCount;
-      fetchUserData();
-
-  
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setUploading3(false);
-    }
-  };
+ 
 
   const handleNextClick = () => {
     // Navigate to a different page 
@@ -208,15 +162,19 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
           <button type="submit">Save Description</button>
         </form>
       </div>
+      <button onClick={fetchUserImages}>Fetch User Images</button>
+      <div>
+        {imageUrls.map((imageUrl, index) => (
+          <img key={index} src={imageUrl} alt={`User Image ${index}`} />
+        ))}
+      </div>
       <h2>Upload profile pictures!</h2>
-      <input type="file" accept="image/*" onChange={handleImageChange1} />
-      <button onClick={handleImageUpload1} disabled={ uploadedPicturesCount >= 3}>Upload Image 1</button>
-      <input type="file" accept="image/*" onChange={handleImageChange2} />
-      <button onClick={handleImageUpload2} disabled={uploadedPicturesCount >= 3}>Upload Image 2</button>
-      <input type="file" accept="image/*" onChange={handleImageChange3} />
-      <button onClick={handleImageUpload3} disabled={uploadedPicturesCount >= 3}>Upload Image 3</button>
+      <input type="file" accept="image/*" onChange={handleImageChange} />
+      <button onClick={handleImageUpload} >Upload Image 1</button>
+
       <p>Please upload at least 3 pictures to continue.</p>
       <button onClick={handleNextClick} disabled={(uploadedPicturesCount < 3)}>Next</button>
+      
     </div>
   );
 }

@@ -489,7 +489,6 @@ app.post('/auth/upload', upload.single('image'), (req, res) => {
           const newCount = currentCount + 1;
           console.log("New picture count:", newCount);
           
-          // Update the user's picture count
           update(ref(database, 'users/' + decodedToken.uid), {
             picturesUploaded: newCount
           })
@@ -508,7 +507,6 @@ app.post('/auth/upload', upload.single('image'), (req, res) => {
         return res.status(500).send('Error verifying token');
       });
   } else {
-    // No file uploaded
     console.error('No file uploaded');
     res.status(400).json({ message: 'No file uploaded' });
   }
@@ -519,7 +517,7 @@ async function fetchUserData(req, res, next) {
 
   try {
     if (idToken) {
-      // Verify the user's ID token
+   
       const decodedToken = await admin.auth().verifyIdToken(idToken);
       const uid = decodedToken.uid;
       const userRef = admin.database().ref(`/users/${uid}`);
@@ -554,10 +552,61 @@ app.get('/auth/fetch-user-data', fetchUserData, (req, res) => {
     // Respond with user data
     res.json(req.userData);
   } else {
-    // Unauthorized or user data not found
+ 
     console.error('Unauthorized or user data not found');
     res.status(401).json({ error: 'Unauthorized' });
   }
+});
+
+app.get('/auth/fetch-user-images', async (req, res) => {
+ 
+  const idToken = req.headers.authorization?.replace('Bearer ', '');
+
+  try {
+    if (idToken) {
+  
+      const decodedToken = await admin.auth().verifyIdToken(idToken);
+      const uid = decodedToken.uid;
+      const userRef = admin.database().ref(`/users/${uid}`);
+
+      // Fetch user data
+      userRef.once('value', (snapshot) => {
+        const userData = snapshot.val();
+        if (userData) {
+        
+          const randomString = userData.randomString || '';
+         
+          const userImagesDirectory = path.join('../front/public/uploads', randomString);
+
+          if (fs.existsSync(userImagesDirectory)) {
+          
+            fs.readdir(userImagesDirectory, (err, files) => {
+              if (err) {
+                console.error('Error reading user images directory:', err);
+                res.status(500).json({ error: 'Internal server error' });
+              } else {
+                // Filter files based on the naming convention 'randomstring
+                const userImages = files.filter((file) => file.startsWith(`${randomString}_`));
+        
+                // Construct URLs for the images
+                const imageUrls = userImages.map((image) => `/uploads/${randomString}/${image}`);
+        
+                res.json({ imageUrls });
+              }
+            });
+          } else {
+ 
+            res.json({ imageUrls: [] });
+          }
+        } else {
+          console.error('User data not found');
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Error verifying ID token:', error);
+  }
+ 
 });
 
 app.listen(port, hostname, () => {
