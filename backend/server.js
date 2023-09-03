@@ -57,60 +57,6 @@ const auth = getAuth();
 const port = 5000;
 const hostname = 'localhost';
 
-//setting up chats
-const socketIO = require('socket.io')(httpServer, {
-  cors: {
-    origin: 'http://localhost:3000',
-    methods: ['GET', 'POST'],
-    credentials: true,
-  },
-});
-
-socketIO.on('connection', (socket) => {
-  console.log(`⚡: ${socket.id} user just connected!`);
-
-  //Listens and logs the message to the console
-  socket.on('message', (data) => {
-    socketIO.emit('messageResponse', data);
-  });
-
-  socket.on('typing', (data) => socket.broadcast.emit('typingResponse', data));
-
-  socket.on('disconnect', () => {
-    console.log('🔥: A user disconnected');
-  });
-});
-
-app.post('/saveChat', (req, res) => {
-  let body = req.body;
-
-  if (
-    !body.hasOwnProperty('receiverID') ||
-    !body.hasOwnProperty('senderID') ||
-    !body.hasOwnProperty('message') ||
-    body.message.trim() === ''
-  ) {
-    return res.status(400).send('Invalid request.');
-  }
-
-  admin
-    .auth()
-    .verifyIdToken(req.headers.authorization)
-    .then((decodedToken) => {
-      update(ref(database, 'chats/' + decodedToken.uid), {
-        receiverID: body.receiverID,
-        senderID: body.senderID,
-        message: body.message,
-      }).catch(() => {
-        console.log('Adding New Message failed');
-        return res.status(500).send('Adding New Message failure');
-      });
-    })
-    .catch((error) => {
-      throw new Error('Error while verifying token:', error);
-    });
-});
-
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: 'https://harmonyplate-68e8b-default-rtdb.firebaseio.com',
@@ -572,6 +518,87 @@ app.get('/auth/fetch-user-data', fetchUserData, (req, res) => {
   }
 });
 
+//CHATS
+const socketIO = require('socket.io')(httpServer, {
+  cors: {
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+    credentials: true,
+  },
+});
+io.use((socket, next) => {
+  VerifySocketToken(socket, next);
+});
+socketIO.on('connection', (socket) => {
+  console.log(`⚡: ${socket.id} user just connected!`);
+
+  //Listens and logs the message to the console
+  socket.on('message', (data) => {
+    socketIO.emit('messageResponse', data);
+  });
+
+  socket.on('typing', (data) => socket.broadcast.emit('typingResponse', data));
+
+  socket.on('disconnect', () => {
+    console.log('🔥: A user disconnected');
+  });
+});
+
+app.post('/saveChat', (req, res) => {
+  let body = req.body;
+
+  if (
+    !body.hasOwnProperty('receiverID') ||
+    !body.hasOwnProperty('senderID') ||
+    !body.hasOwnProperty('message') ||
+    body.message.trim() === ''
+  ) {
+    return res.status(400).send('Invalid request.');
+  }
+
+  admin
+    .auth()
+    .verifyIdToken(req.headers.authorization)
+    .then((decodedToken) => {
+      update(ref(database, 'messages/' + decodedToken.uid), {
+        name: body.receiverID,
+        senderID: body.senderID,
+        message: body.message,
+      }).catch(() => {
+        console.log('Adding New Message failed');
+        return res.status(500).send('Adding New Message failure');
+      });
+    })
+    .catch((error) => {
+      throw new Error('Error while verifying token:', error);
+    });
+});
+
 app.listen(port, hostname, () => {
   console.log(`http://${hostname}:${port}`);
+});
+
+// Get info for user's profile
+app.get('/auth/getUserProfile', (req, res) => {
+  admin
+    .auth()
+    .verifyIdToken(req.headers.authorization)
+    .then((decodedToken) => {
+      const userRef = ref(database, 'users/' + decodedToken.uid);
+
+      onValue(
+        userRef,
+        (snapshot) => {
+          const userData = snapshot.val();
+          res.status(200).json(userData);
+        },
+        {
+          onlyOnce: true,
+        }
+      );
+    })
+    .catch((error) => {
+      console.error('Error while verifying token:', error);
+      res.status(500).send('Error while retrieving user profile');
+    });
 });

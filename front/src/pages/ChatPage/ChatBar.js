@@ -1,6 +1,8 @@
 import React from 'react';
 
 const ChatBar = ({ userData }) => {
+  const pool = userData && userData.pool;
+
   return (
     <div className="chat__sidebar">
       <h2>Chats</h2>
@@ -8,22 +10,21 @@ const ChatBar = ({ userData }) => {
       <div>
         <h4 className="chat__header">All Matches</h4>
         <div className="chat__users">
-          {/* TO-DO: pull profile photos and match list */}
-          {userData &&
-            userData.matches.map((match) => (
-              <div key={match.id}>
-                {' '}
-                {/* Add key to the outer div */}
+          {pool && pool.length > 0 ? (
+            pool.map((match, index) => (
+              <div key={index}>
                 <div className="user__image">
                   <img
-                    src={`../public/uploads/${match.id}/${match.id}_0`}
-                    alt={match.name}
-                  />{' '}
-                  {/* Add alt attribute */}
+                    src={`../public/uploads/${match}/${match}_0`}
+                    alt={match}
+                  />
                 </div>
-                <p>{match.name}</p>
+                <p>{match}</p>
               </div>
-            ))}
+            ))
+          ) : (
+            <p>No matches found.</p>
+          )}
         </div>
       </div>
     </div>
