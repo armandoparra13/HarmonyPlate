@@ -9,7 +9,13 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
   const [selectedImage, setSelectedImage] = useState(null);
   const navigate = useNavigate();
   let [description, setDescription] = useState('');
+  const [uploadedPicturesCount, setUploadedPicturesCount] = useState(0); 
+  const [uploading, setUploading] = useState(false);
 
+  useEffect(() => {
+    // Fetch initial value for uploadedPicturesCount when the component mounts
+    fetchUserData();
+  }, []);
 
   const fetchUserData = async () => {
     if (currentUser) {
@@ -19,6 +25,12 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
             Authorization: `Bearer ${currentUser.accessToken}`,
           },
         });
+        if (response.data && typeof response.data.picturesUploaded === 'number') {
+          // Set the picturesUploaded count in the state
+          setUploadedPicturesCount(response.data.picturesUploaded);
+          console.log(response.data.picturesUploaded);
+          console.log(uploadedPicturesCount);
+        }
         console.log(response.data);
         setUserData(response.data);
       } catch (error) {
@@ -35,6 +47,7 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
   }
 
   const handleDescSubmit = async (event) => {
+    event.preventDefault();
     try {
       const response = await axios.post(
         '/auth/submit-desc',
@@ -63,8 +76,11 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
     if (!selectedImage || !currentUser) {
       return;
     }
+
+    setUploading(true);
     const formData = new FormData();
     formData.append('image', selectedImage);
+  
 
     try {
       const response = await axios.post('/auth/upload', formData, {
@@ -73,19 +89,30 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
           Authorization: `Bearer ${currentUser.accessToken}`,
         },
       }).then((response) => {
+        const updatedPicCount = response.data.picturesCount;
+       
+      
         fetchUserData();
-        console.log(response.data);
+       
       })
 
 
     } catch (error) {
       console.error(error);
+    } finally {
+      setUploading(false);
     }
   };
+
+
   const handleNextClick = () => {
     // Navigate to a different page 
-
-    navigate("/spotify-login");
+    
+    if (uploadedPicturesCount >= 3 ) {
+      navigate("/spotify-login");
+    } else {
+      alert("Please upload at least 3 pictures.");
+    }
   };
 
   return (
@@ -108,8 +135,8 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
       <h2>Upload profile pictures!</h2>
       <input type="file" accept="image/*" onChange={handleImageChange} />
       <button onClick={handleImageUpload}>Upload Image</button>
-      <p>Please upload at least 2 pictures to continue.</p>
-      <button onClick={handleNextClick}>Next</button>
+      <p>Please upload at least 3 pictures to continue.</p>
+      <button onClick={handleNextClick} disabled={(uploadedPicturesCount < 3)}>Next</button>
     </div>
   );
 }
