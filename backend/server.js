@@ -325,7 +325,7 @@ app.get("/auth/getMatches", (req, res) => {
 app.get("/auth/recipe/:id", (req, res) => {
   let id = req.params.id;
   axios.get(`${spoonacularUrl}recipes/${id}/information?apiKey=${spoonacularApi}`).then(response => {
-    console.log(response);
+    console.log("get recipe", response);
     res.status(200).send(response.data);
   })
 })  
