@@ -1,40 +1,18 @@
-.home-container {
-    display: flex;
-}
-
-.navbar {
-    flex-basis: 0;
-    overflow: hidden;
-    transition: flex-basis 0.3s ease;
-    background-color: #f4f4f4;
-    padding: 15px;
-    height: 100vh;
-}
-
-.navbar.open {
-    flex-basis: 200px;
-}
-
-.toggle-nav {
-    margin-bottom: 20px;
-}
-
 .main-content {
     flex: 1;
     padding: 20px;
+    width: 90%
 }
 
 .match-box {
+    display: flex;
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center; 
     border: 1px solid #ccc;
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-}
-
-.actions {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
 }
 
 .like-btn {
@@ -53,4 +31,50 @@
     padding: 10px 20px;
     cursor: pointer;
     border-radius: 5px;
+}
+
+.match-info{
+    justify-content: center; 
+    align-items: center;
+    display: flex;
+    flex-direction: column; 
+}
+
+.match-card {
+    justify-content: center; 
+    align-items: center;
+    display: flex;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 16px;
+    padding: 15px;
+    background-color: #84A59D;
+}
+
+.match-card-image {
+    width: 100%;
+    height: auto;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.match-card-content {
+    padding: 16px;
+}
+
+.match-card-title {
+    font-size: 1.2rem;
+    margin: 8px 0;
+}
+
+.match-card-description {
+    font-size: 1rem;
+    margin-bottom: 8px;
+}
+
+.match-card-food, .match-card-artist {
+    font-size: 0.9rem;
+    color: #555;
 }
