@@ -1,65 +1,44 @@
 import React, { useEffect, useState, useRef } from 'react';
 import './ChatPage.css';
-<<<<<<< HEAD
-=======
 import { useAuth } from '../../contexts/Auth';
->>>>>>> 92229ae (display matches and chat suggestions)
 import axios from 'axios';
+import io from 'socket.io-client';
 import ChatBar from './ChatBar';
 import ChatBody from './ChatBody';
 import ChatFooter from './ChatFooter';
+import Chat from './Chat';
 
-const ChatPage = ({ socket }) => {
+const socket = io.connect('http://localhost:3000');
+
+const ChatPage = () => {
   const [messages, setMessages] = useState([]);
   const [typingStatus, setTypingStatus] = useState('');
   const lastMessageRef = useRef(null);
-<<<<<<< HEAD
-  const [currentUser, setCurrentUser] = useState(null);
-  const [userData, setUserData] = useState(null);
-  const [loadingUserData, setLoadingUserData] = useState(true);
-
-  useEffect(() => {
-    // Fetch the access token for the current user
-    const fetchAccessToken = async () => {
-      try {
-        const response = await axios.get('/auth/token');
-        setCurrentUser({ accessToken: response.data.accessToken });
-      } catch (error) {
-        console.error('Error fetching access token:', error);
-      }
-    };
-
-    fetchAccessToken();
-  }, []);
-
-  useEffect(() => {
-    if (currentUser && currentUser.accessToken) {
-      // Fetch user data including matches using the access token
-      const fetchUserData = async () => {
-        try {
-          const response = await axios.get('/auth/fetch-user-data', {
-            headers: {
-              Authorization: `Bearer ${currentUser.accessToken}`,
-            },
-          });
-          setUserData(response.data);
-        } catch (error) {
-          console.error('Error fetching user data:', error);
-        } finally {
-          setLoadingUserData(false);
-        }
-      };
-
-      fetchUserData();
-    }
-  }, [currentUser]);
-
-  useEffect(() => {
-=======
   const [userData, setUserData] = useState(null);
   const { currentUser } = useAuth();
+  const [isUserSelected, setIsUserSelected] = useState(false);
+  const [messageList, setMessageList] = useState([]);
   const [favoriteFoodImage, setFavoriteFoodImage] = useState(null);
   const [favoriteFood, setFavoriteFood] = useState(null);
+  const [selectedMatch, setSelectedMatch] = useState(null);
+  const [room, setRoom] = useState('');
+
+  const chooseMatch = (selectedMatch) => {
+    setSelectedMatch(selectedMatch);
+
+    setIsUserSelected(true);
+  };
+
+  const assignRoom = (roomID) => {
+    console.log(roomID);
+    socket.emit('join_room', roomID);
+    setRoom(roomID);
+    console.log(room);
+  };
+
+  const printChat = (messageList) => {
+    setMessageList(messageList);
+  };
 
   useEffect(() => {
     // Function to fetch user data
@@ -70,7 +49,7 @@ const ChatPage = ({ socket }) => {
             authorization: currentUser.accessToken,
           },
         });
-
+        console.log(currentUser);
         setUserData(response.data);
         console.log(userData);
         favoriteFood(response.data.food.favoriteFood);
@@ -97,49 +76,37 @@ const ChatPage = ({ socket }) => {
   }, []);
 
   useEffect(() => {
->>>>>>> 92229ae (display matches and chat suggestions)
-    socket.on('messageResponse', (data) => setMessages([...messages, data]));
-  }, [socket, messages]);
-
-  useEffect(() => {
-<<<<<<< HEAD
-    lastMessageRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  useEffect(() => {
-    socket.on('typingResponse', (data) => setTypingStatus(data));
-  }, [socket]);
-
-=======
-    socket.on('typingResponse', (data) => setTypingStatus(data));
-  }, [socket]);
-
-  useEffect(() => {
     // 👇️ scroll to bottom every time messages change
     lastMessageRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
->>>>>>> 92229ae (display matches and chat suggestions)
-  console.log(currentUser);
+  console.log(messageList);
+
+  console.log(userData);
 
   return (
     <div className="chat">
-<<<<<<< HEAD
-      <ChatBar socket={socket} currentUser={currentUser} userData={userData} />
-=======
-      <ChatBar socket={socket} userData={userData} />
->>>>>>> 92229ae (display matches and chat suggestions)
+      <ChatBar
+        socket={socket}
+        userData={userData}
+        chooseMatch={chooseMatch}
+        assignRoom={assignRoom}
+      />
       <div className="chat__main">
-        <ChatBody
-          messages={messages}
-          typingStatus={typingStatus}
-          lastMessageRef={lastMessageRef}
-<<<<<<< HEAD
-=======
-          favouriteFood={favoriteFood}
->>>>>>> 92229ae (display matches and chat suggestions)
-        />
-        <ChatFooter socket={socket} currentUser={currentUser} />
+        {isUserSelected ? ( // Only render when a user is selected
+          <>
+            <ChatFooter
+              socket={socket}
+              userData={userData}
+              selectedMatch={selectedMatch}
+              printChat={printChat}
+              messageList={messageList}
+              uniqueRoom={assignRoom}
+            />
+          </>
+        ) : (
+          <p>Select a user to start a chat</p>
+        )}
       </div>
     </div>
   );

@@ -14,7 +14,6 @@ import SpotifyLoginPage from './pages/SpotifyLoginPage/SpotifyLoginPage';
 import SpotifySuccessPage from './pages/SpotifyLoginPage/SpotifySuccessPage';
 import UploadPictures from './pages/ProfileCreationPage/UploadPictures';
 import ChatPage from './pages/ChatPage/ChatPage';
-import io from 'socket.io-client';
 import { useAuth } from './contexts/Auth';
 import axios from 'axios';
 import Sidebar from './components/Sidebar/Sidebar';
@@ -30,10 +29,11 @@ export const AppRoutes = () => {
   const [userData, setUserData] = useState(null);
   const [loadingUserData, setLoadingUserData] = useState(true);
 
-  const socket = io.connect('http://localhost:3000', {
-    transports: ['websocket'],
-    withCredentials: true,
-  });
+  //const socket = io.connect('http://localhost', {
+  //  transports: ['websocket'],
+  //  withCredentials: true,
+  //autoConnect: false,
+  //});
 
   useEffect(() => {
     async function fetchUserData() {
@@ -139,7 +139,7 @@ export const AppRoutes = () => {
                     )
                   }
                 />
-                <Route path="/chats" element={<ChatPage socket={socket} />} />{' '}
+                <Route path="/chats" element={<ChatPage />} />{' '}
                 <Route
                   path="/SignUp"
                   element={

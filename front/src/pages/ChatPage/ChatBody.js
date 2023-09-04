@@ -1,48 +1,62 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const ChatBody = ({
   messages,
+  userData,
   typingStatus,
   lastMessageRef,
   favouriteFood,
+  selectedMatch,
 }) => {
+  //const [favoriteFood, setFavoriteFood] = useState(null);
+  console.log(messages);
+
   const navigate = useNavigate();
 
   const handleLeaveChat = () => {
-    localStorage.removeItem('userName');
     navigate('/homepage');
     window.location.reload();
   };
 
+  const matchProfileUsername =
+    selectedMatch && selectedMatch.matchProfile
+      ? selectedMatch.matchProfile.username
+      : 'Username not found';
+
+  console.log(selectedMatch);
   return (
     <>
       <header className="chat__mainHeader">
-        <p>Hangout in Harmony</p>
+        <div>
+          <p>{matchProfileUsername}</p>
+        </div>
+
         <button className="leaveChat__btn" onClick={handleLeaveChat}>
           EXIT CHAT
         </button>
       </header>
 
       <div className="message__container">
-        <div className="message__starter">Your match likes {favouriteFood}</div>
-        {messages.map((message) =>
-          message.name === localStorage.getItem('userName') ? (
-            <div className="message__chats" key={message.id}>
-              <p className="sender__name">You</p>
-              <div className="message__sender">
-                <p>{message.text}</p>
+        <div className="message__starter">Your match likes</div>
+        {messages.map((messageContent) => {
+          return (
+            <div
+              className="message"
+              id={userData.username === messageContent.author ? 'you' : 'match'}
+            >
+              <div>
+                <div className="message-content">
+                  <p>{messageContent.message}</p>
+                </div>
+                <div className="message-meta">
+                  <p id="time">{messageContent.time}</p>
+                  <p id="author">{messageContent.author}</p>
+                </div>
               </div>
             </div>
-          ) : (
-            <div className="message__chats" key={message.id}>
-              <p>{message.name}</p>
-              <div className="message__recipient">
-                <p>{message.text}</p>
-              </div>
-            </div>
-          )
-        )}
+          );
+        })}
 
         <div className="message__status">
           <p>{typingStatus}</p>

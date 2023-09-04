@@ -30,7 +30,6 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(bodyParser.json());
-const httpServer = createServer();
 
 let api_key = env['apiKey'];
 let domain = env['authDomain'];
@@ -522,7 +521,8 @@ app.get('/auth/fetch-user-data', fetchUserData, (req, res) => {
 });
 
 //CHATS
-const socketIO = new Server(httpServer, {
+const httpServer = createServer();
+const io = new Server(httpServer, {
   cors: {
     origin: 'http://localhost:3000',
     methods: ['GET', 'POST'],
@@ -530,49 +530,86 @@ const socketIO = new Server(httpServer, {
   },
 });
 
-socketIO.on('connection', (socket) => {
-  console.log(`⚡: ${socket.id} user just connected!`);
+io.on('connection', (socket) => {
+  console.log('⚡: A user connected');
 
-  //Listens and logs the message to the console
-  socket.on('message', (data) => {
-    socketIO.emit('messageResponse', data);
+  socket.on('join_room', (data) => {
+    socket.join(data);
+    console.log(`User with ID: ${socket.id} joined room: ${data}`);
   });
 
-  socket.on('typing', (data) => socket.broadcast.emit('typingResponse', data));
+  socket.on('send_message', (data) => {
+    socket.to(data.room).emit('receive_message', data);
+  });
 
+  // Handle disconnection event
   socket.on('disconnect', () => {
     console.log('🔥: A user disconnected');
   });
 });
 
-app.post('/saveChat', (req, res) => {
-  let body = req.body;
+app.post('/auth/saveChat', async (req, res) => {
+  try {
+    const body = req.body;
+    const { content, to } = body;
+    console.log(content);
+    console.log(to);
+    if (!content || !to || content.trim() === '') {
+      return res.status(400).send('Invalid request.');
+    }
 
-  if (
-    !body.hasOwnProperty('receiverID') ||
-    !body.hasOwnProperty('senderID') ||
-    !body.hasOwnProperty('message') ||
-    body.message.trim() === ''
-  ) {
-    return res.status(400).send('Invalid request.');
+    // Verify the Firebase ID token
+    const decodedToken = await admin
+      .auth()
+      .verifyIdToken(req.headers.authorization);
+
+    // Generate a unique chat ID based on the users' IDs
+    const chatId = `${decodedToken.uid}_${to}`;
+
+    // Reference to the chat in the Firebase database
+    const chatRef = admin.database().ref(`messages/${chatId}`);
+    console.log(newMessage);
+    // Create a new message object
+    const newMessage = {
+      content,
+      from: decodedToken.uid, // You can use the sender's user ID
+      timestamp: Date.now(),
+    };
+
+    // Push the new message to the chat
+    await chatRef.push(newMessage);
+
+    return res.status(200).send('Message saved successfully.');
+  } catch (error) {
+    console.error('Error saving chat message:', error);
+    return res.status(500).send('Internal server error.');
+  }
+});
+
+app.get('/auth/getMatchProfile', (req, res) => {
+  const { uid } = req.query;
+
+  if (!uid) {
+    return res.status(400).json({ error: 'UID parameter is missing' });
   }
 
-  admin
-    .auth()
-    .verifyIdToken(req.headers.authorization)
-    .then((decodedToken) => {
-      update(ref(database, 'messages/' + decodedToken.uid), {
-        name: body.receiverID,
-        senderID: body.senderID,
-        message: body.message,
-      }).catch(() => {
-        console.log('Adding New Message failed');
-        return res.status(500).send('Adding New Message failure');
-      });
-    })
-    .catch((error) => {
-      throw new Error('Error while verifying token:', error);
-    });
+  const userRef = ref(database, 'users/' + uid);
+
+  onValue(
+    userRef,
+    (snapshot) => {
+      const userData = snapshot.val();
+
+      if (!userData) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      res.status(200).json(userData);
+    },
+    {
+      onlyOnce: true,
+    }
+  );
 });
 
 app.listen(port, hostname, () => {
