@@ -25,7 +25,6 @@ function FoodPage({ setUserData, setLoadingUserData }) {
                         Authorization: `Bearer ${currentUser.accessToken}`,
                     },
                 });
-                console.log(response.data);
                 setUserData(response.data);
             } catch (error) {
                 console.error('Error fetching user data:', error);
@@ -66,22 +65,16 @@ function FoodPage({ setUserData, setLoadingUserData }) {
 
     const onChoose = (e) => {
         const previouslySelected = document.querySelector('.selected-option');
-        console.log(e)
         if (previouslySelected) {
             previouslySelected.classList.remove('selected-option');
         }
         e.currentTarget.classList.add('selected-option');
-        setOptionChosen(e.currentTarget.id); //changed target 
-        console.log(e.currentTarget.id);
+        setOptionChosen(e.currentTarget.id); //changed target
     }
 
     const submitChoice = () => {
-        console.log(optionChosen);
-
 
         if (optionChosen !== '') {
-
-            console.log('hi');
             axios.post(
                 '/auth/foodChoice',
                 {
@@ -99,9 +92,18 @@ function FoodPage({ setUserData, setLoadingUserData }) {
                 console.log('Food choice submitted successfully.');
 
                 fetchUserData();
-                navigate('/create-profile');
-
-
+                axios.get(
+                    '/auth/getMatches',
+                    {
+                        headers: {
+                            authorization: currentUser.accessToken,
+                        },
+                    }
+                ).then((response) => {
+                    navigate('/homepage');
+                }).catch(error => {
+                    console.log('Error Finding matches:', error);
+                })
             }).catch(error => {
                 console.error('Error submitting food choice:', error);
 

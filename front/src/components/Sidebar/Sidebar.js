@@ -90,13 +90,13 @@ const Sidebar = ({ children }) => {
                     </div>
                     {
                         menuItem.map((item, index) => (
-                            <NavLink to={item.path} key={index} className="link" activeclassName="active-menu">
+                            <NavLink to={item.path} key={index} className="link" >
                                 <div className="icon">{item.icon}</div>
                                 <div style={{ display: isOpen ? "block" : "none" }} className="linkText"> {item.name}</div>
                             </NavLink>
                         ))
                     }
-                    <NavLink onClick={handleLogout} style={{ display: isOpen ? "block" : "none" }} to="/" className="link" activeclassName="active">
+                    <NavLink onClick={handleLogout} style={{ display: isOpen ? "block" : "none" }} to="/" className="link" >
                         <div className="linkText"> Logout</div>
                     </NavLink>
                 </div>)}
