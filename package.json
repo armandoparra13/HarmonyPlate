@@ -6,7 +6,8 @@
   "main": "index.js",
   "scripts": {
     "install:all": "npm install && cd front && npm install && cd ../backend && npm install",
-    "start": "concurrently \"cd backend && npm start\" \"cd front && npm start\""
+    "start": "concurrently \"cd backend && npm start\" \"cd front && npm start\"",
+    "front:build": "cd front && npm run build"
   },
   "repository": {
     "type": "git",
