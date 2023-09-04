@@ -133,6 +133,7 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
       if (response.status === 200) {
         fetchUserImages();
         fetchUserData();
+        console.log('HEYHKFBKMJSBFKS');
       } else {
         console.error('Upload failed with status:', response.status);
       }
