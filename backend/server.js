@@ -1,11 +1,9 @@
 import express from 'express';
 import { initializeApp } from 'firebase/app';
-import { getDatabase, limitToFirst, ref, set, update, query, orderByKey, onValue, get} from "firebase/database";
-import env from './env_backend.json' assert { type: 'json' };
+import { getDatabase, limitToFirst, ref, set, update, query, orderByKey, onValue, get } from "firebase/database";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import axios from 'axios';
 import admin from 'firebase-admin';
-import serviceAccount from "./serviceAccount.json" assert { type: 'json' };
 import cors from 'cors';
 import request from 'request';
 import path from 'path';
@@ -96,7 +94,7 @@ app.post("/auth/signup", (req, res) => {
         spotifyLinked: false,
         foodsChosen: false,
         randomString: randomString
-        
+
       }).then(() => {
         return res.send("User creation successful");
       }).catch(() => {
@@ -114,27 +112,27 @@ app.post("/auth/signup", (req, res) => {
 
 //SPOTIFY
 
-let CLIENT_ID = env["spotifyClientID"];
-let REDIRECT_URI = env["spotifyRedirectURI"];
-let CLIENT_SECRET = env["spotifyClientSecret"];
+let CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
+let REDIRECT_URI = process.env.REDIRECT_URI;
+let CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 
 var generateRandomString = function (length) {
-    var text = '';
-    var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  
-    for (var i = 0; i < length; i++) {
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
-  };
+  var text = '';
+  var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-app.get('/auth/spotify', function(req, res) {
+  for (var i = 0; i < length; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
+  return text;
+};
+
+app.get('/auth/spotify', function (req, res) {
   console.log('login');
   console.log(req.query.accessToken);
   var state = req.query.accessToken;
   var scope = 'user-read-private user-read-email user-top-read';
 
-  
+
   var auth_query_parameters = new URLSearchParams({
     response_type: "code",
     client_id: CLIENT_ID,
@@ -151,94 +149,94 @@ app.get('/auth/spotify', function(req, res) {
 });
 
 app.get('/auth/spotify-success', (req, res) => {
-  
-    var code = req.query.code;
-    console.log(code);
-    console.log("access", req.query.state);
-    let firebaseAccessToken = req.query.state;
-  
-    var authOptions = {
-      url: 'https://accounts.spotify.com/api/token',
-      form: {
-        code: code,
-        redirect_uri: REDIRECT_URI,
-        grant_type: 'authorization_code'
-      },
-      headers: {
-        'Authorization': 'Basic ' + (Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64')),
-        'Content-Type' : 'application/x-www-form-urlencoded'
-      },
-      json: true
-    };
-  
-    request.post(authOptions, function(error, response, body) {
-      //console.log(response.statusCode);
-      if (!error && response.statusCode === 200) {
-        //console.log(body.access_token);
-        let access_token = body.access_token;
 
-        axios.get('https://api.spotify.com/v1/me/top/artists?time_range=medium_term&limit=20', {
-            headers: {
-                Authorization: `Bearer ${access_token}`
-            }
-        }).then(response => {
-            const topArtists = response.data.items;
-            const artistNames = topArtists.map(artist => artist.name);
-            const artistGenres = topArtists.map(artist => artist.genres);
-            /*
-            topArtists.forEach(artist => {
-                const artistName = artist.name;
-                const artistGenres = artist.genres;
-                const artistPopularity = artist.popularity;
+  var code = req.query.code;
+  console.log(code);
+  console.log("access", req.query.state);
+  let firebaseAccessToken = req.query.state;
 
-                console.log(`Artist name: ${artistName}`);
-                console.log(`Genres: ${artistGenres.join(', ')}`);
-                
-            })
-            */
-            //res.send(`<pre>${JSON.stringify(response.data, null, 2)}</pre>`);
-            //console.log(response.data.name[0]);
-            admin.auth()
-            .verifyIdToken(firebaseAccessToken)
-            .then(decodedToken => {
-              update(ref(database, 'users/' + decodedToken.uid), {
-                spotify: { 
-                  artistNames: artistNames,
-                  artistGenres: artistGenres
-                },
-                spotifyLinked: true
-              }).then(() => {
-                res.redirect('/spotify-success');
-              }).catch(() => {
-                //console.log("Adding Spotify failed");
-                return res.status(500).send("Adding Spotify failure");
-              })
-        
-            })
-            .catch(error => {
-              throw new Error('Error while verifying token:', error)
-            })
-        
-        }).catch(error => {
-            res.send(error);
+  var authOptions = {
+    url: 'https://accounts.spotify.com/api/token',
+    form: {
+      code: code,
+      redirect_uri: REDIRECT_URI,
+      grant_type: 'authorization_code'
+    },
+    headers: {
+      'Authorization': 'Basic ' + (Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64')),
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    json: true
+  };
+
+  request.post(authOptions, function (error, response, body) {
+    //console.log(response.statusCode);
+    if (!error && response.statusCode === 200) {
+      //console.log(body.access_token);
+      let access_token = body.access_token;
+
+      axios.get('https://api.spotify.com/v1/me/top/artists?time_range=medium_term&limit=20', {
+        headers: {
+          Authorization: `Bearer ${access_token}`
+        }
+      }).then(response => {
+        const topArtists = response.data.items;
+        const artistNames = topArtists.map(artist => artist.name);
+        const artistGenres = topArtists.map(artist => artist.genres);
+        /*
+        topArtists.forEach(artist => {
+            const artistName = artist.name;
+            const artistGenres = artist.genres;
+            const artistPopularity = artist.popularity;
+
+            console.log(`Artist name: ${artistName}`);
+            console.log(`Genres: ${artistGenres.join(', ')}`);
+            
         })
-        //res.redirect('/spotify-success')
-      }
-    });
-  })
+        */
+        //res.send(`<pre>${JSON.stringify(response.data, null, 2)}</pre>`);
+        //console.log(response.data.name[0]);
+        admin.auth()
+          .verifyIdToken(firebaseAccessToken)
+          .then(decodedToken => {
+            update(ref(database, 'users/' + decodedToken.uid), {
+              spotify: {
+                artistNames: artistNames,
+                artistGenres: artistGenres
+              },
+              spotifyLinked: true
+            }).then(() => {
+              res.redirect('/spotify-success');
+            }).catch(() => {
+              //console.log("Adding Spotify failed");
+              return res.status(500).send("Adding Spotify failure");
+            })
+
+          })
+          .catch(error => {
+            throw new Error('Error while verifying token:', error)
+          })
+
+      }).catch(error => {
+        res.send(error);
+      })
+      //res.redirect('/spotify-success')
+    }
+  });
+})
 
 app.get('/auth/token', (req, res) => {
-    
-    res.json(
-       {
-          access_token: access_token
-       })
 
-    //console.log(res.json());
-  })
+  res.json(
+    {
+      access_token: access_token
+    })
 
-let spoonacularUrl = env["spoonacular_url"];
-let spoonacularApi = env["spoonacular_key"];
+  //console.log(res.json());
+})
+
+let spoonacularUrl = process.env.SPOONACULAR_URL;
+let spoonacularApi = process.env.SPOONACULAR_API;
 
 
 
@@ -301,27 +299,27 @@ app.post("/auth/foodChoice", async (req, res) => {
   console.log(food, diet, cuisine)
   console.log(body.chosenFood)
   admin
-  .auth()
-  .verifyIdToken(req.headers.authorization)
-  .then((decodedToken) => {
-    return update(ref(database, 'users/' + decodedToken.uid), {
-      food: {
-        favoriteFood: food,
-        diet: diet,
-        cuisine: cuisine
-      },
-      foodsChosen: true
+    .auth()
+    .verifyIdToken(req.headers.authorization)
+    .then((decodedToken) => {
+      return update(ref(database, 'users/' + decodedToken.uid), {
+        food: {
+          favoriteFood: food,
+          diet: diet,
+          cuisine: cuisine
+        },
+        foodsChosen: true
+      });
+    })
+    .then(() => {
+      console.log('Adding Favorite Food succeeded');
+      //res.redirect('/create-profile');
+      return res.status(200).send('Food choice submitted successfully.');
+    })
+    .catch((error) => {
+      console.error('Error while processing food choice:', error);
+      return res.status(500).json('Food choice submission failed.');
     });
-  })
-  .then(() => {
-    console.log('Adding Favorite Food succeeded');
-    //res.redirect('/create-profile');
-    return res.status(200).send('Food choice submitted successfully.');
-  })
-  .catch((error) => {
-    console.error('Error while processing food choice:', error);
-    return res.status(500).json('Food choice submission failed.');
-  });
 
 })
 
@@ -329,7 +327,7 @@ app.get("/auth/getMatches", (req, res) => {
   let usersSnapshot = query(ref(database, 'users'), orderByKey(), limitToFirst(10));
   let randomUserIds = [];
 
-    admin.auth()
+  admin.auth()
     .verifyIdToken(req.headers.authozriation)
     .then(decodedToken => {
       onValue(usersSnapshot, (snapshot) => {
@@ -340,13 +338,13 @@ app.get("/auth/getMatches", (req, res) => {
             randomUserIds.push(childKey);
           }
         });
-      
-      update(ref(database, 'users/' + decodedToken.uid), {
-        pool: randomUserIds
-      }).catch(() => {
-        console.log("Updating user pool failed");
-        return res.status(500).send("Updating user pool failed");
-      })
+
+        update(ref(database, 'users/' + decodedToken.uid), {
+          pool: randomUserIds
+        }).catch(() => {
+          console.log("Updating user pool failed");
+          return res.status(500).send("Updating user pool failed");
+        })
 
       }, {
         onlyOnce: true
@@ -364,7 +362,7 @@ app.get("/auth/recipe/:id", (req, res) => {
     console.log(response);
     res.status(200).send(response.data);
   })
-})  
+})
 
 //description
 
@@ -376,7 +374,7 @@ app.post('/auth/submit-desc', async (req, res) => {
     .verifyIdToken(req.headers.authorization)
     .then(decodedToken => {
       update(ref(database, 'users/' + decodedToken.uid), {
-        description: body.desc 
+        description: body.desc
       }).catch(() => {
         console.log("Adding desc failed");
         return res.status(500).send("Adding desc failure");
@@ -392,10 +390,10 @@ const pictureCounters = {};
 
 async function getUserRandomString(req) {
   const token = req.headers.authorization?.split(' ')[1];
-  
+
 
   try {
-    if(token) {
+    if (token) {
       const decodedToken = await admin.auth().verifyIdToken(token);
 
       const uid = decodedToken.uid;
@@ -407,20 +405,20 @@ async function getUserRandomString(req) {
       if (userData && userData.randomString) {
         return userData.randomString;
 
-        
+
       } else {
-          console.log('User data not found');
-          return null;
+        console.log('User data not found');
+        return null;
       }
     }
-    
+
   } catch (error) {
     console.error('Error verifying ID token:', error);
     return null;
   }
-    
 
-  
+
+
 }
 
 //UPLOAD PICTURES
@@ -431,27 +429,27 @@ const storage = multer.diskStorage({
 
       const token = req.headers.authorization?.split(' ')[1];
       const decodedToken = await admin.auth().verifyIdToken(token);
-        
-      const userID = decodedToken.uid; 
+
+      const userID = decodedToken.uid;
       const userRef = ref(database, 'users/' + userID);
       const userSnapshot = await get(userRef);
       const user = userSnapshot.val();
 
-        
+
       const userFolderPath = path.join('../front/public/uploads', userRandomString);
       fs.mkdirSync(userFolderPath, { recursive: true });
 
-        //req.decodedToken = decodedToken;
+      //req.decodedToken = decodedToken;
       cb(null, userFolderPath);
     } catch (error) {
       cb(error);
     }
-},
+  },
   filename: async (req, file, cb) => {
     try {
       const userRandomString = await getUserRandomString(req);
       const fileExtension = path.extname(file.originalname);
-  
+
       //console.log('User Random String:', userRandomString);
       const pictureNumber = pictureCounters[userRandomString] || 0; // Get the picture number for the user
 
@@ -460,10 +458,10 @@ const storage = multer.diskStorage({
       const uniqueFilename = `${userRandomString}_${pictureNumber}${fileExtension}`;
 
       cb(null, uniqueFilename);
-  } catch (error) {
+    } catch (error) {
       cb(error);
-  }
-   
+    }
+
   }
 });
 
@@ -475,13 +473,13 @@ app.post('/auth/upload', upload.single('image'), (req, res) => {
     console.log('File uploaded:', req.file);
 
     const idToken = req.headers.authorization?.replace('Bearer ', '');
-    
+
     admin.auth()
       .verifyIdToken(idToken)
       .then(async (decodedToken) => {
         const userID = decodedToken.uid;
         const userRef = ref(database, 'users/' + userID);
-     
+
         const userSnapshot = await get(userRef);
         const userData = userSnapshot.val();
         console.log("pictures:", userData);
@@ -490,11 +488,11 @@ app.post('/auth/upload', upload.single('image'), (req, res) => {
           const currentCount = userData.picturesUploaded;
           const newCount = currentCount + 1;
           console.log("New picture count:", newCount);
-          
+
           update(ref(database, 'users/' + decodedToken.uid), {
             picturesUploaded: newCount
           })
-           
+
             .catch((error) => {
               console.error('Error updating picture count:', error);
               return res.status(500).send("Adding picture failure");
@@ -519,7 +517,7 @@ async function fetchUserData(req, res, next) {
 
   try {
     if (idToken) {
-   
+
       const decodedToken = await admin.auth().verifyIdToken(idToken);
       const uid = decodedToken.uid;
       const userRef = admin.database().ref(`/users/${uid}`);
@@ -531,7 +529,7 @@ async function fetchUserData(req, res, next) {
           const spotifyLinked = userData.spotifyLinked || false;
           const foodsChosen = userData.foodsChosen || false;
           const picturesUploaded = userData.picturesUploaded || 0;
-          
+
           // Store user data in the request object
           req.userData = {
             picturesUploaded,
@@ -554,19 +552,19 @@ app.get('/auth/fetch-user-data', fetchUserData, (req, res) => {
     // Respond with user data
     res.json(req.userData);
   } else {
- 
+
     console.error('Unauthorized or user data not found');
     res.status(401).json({ error: 'Unauthorized' });
   }
 });
 
 app.get('/auth/fetch-user-images', async (req, res) => {
- 
+
   const idToken = req.headers.authorization?.replace('Bearer ', '');
 
   try {
     if (idToken) {
-  
+
       const decodedToken = await admin.auth().verifyIdToken(idToken);
       const uid = decodedToken.uid;
       const userRef = admin.database().ref(`/users/${uid}`);
@@ -575,13 +573,13 @@ app.get('/auth/fetch-user-images', async (req, res) => {
       userRef.once('value', (snapshot) => {
         const userData = snapshot.val();
         if (userData) {
-        
+
           const randomString = userData.randomString || '';
-         
+
           const userImagesDirectory = path.join('../front/public/uploads', randomString);
 
           if (fs.existsSync(userImagesDirectory)) {
-          
+
             fs.readdir(userImagesDirectory, (err, files) => {
               if (err) {
                 console.error('Error reading user images directory:', err);
@@ -589,15 +587,15 @@ app.get('/auth/fetch-user-images', async (req, res) => {
               } else {
                 // Filter files based on the naming convention 'randomstring
                 const userImages = files.filter((file) => file.startsWith(`${randomString}_`));
-        
+
                 // Construct URLs for the images
                 const imageUrls = userImages.map((image) => `/uploads/${randomString}/${image}`);
-        
+
                 res.json({ imageUrls });
               }
             });
           } else {
- 
+
             res.json({ imageUrls: [] });
           }
         } else {
@@ -608,7 +606,7 @@ app.get('/auth/fetch-user-images', async (req, res) => {
   } catch (error) {
     console.error('Error verifying ID token:', error);
   }
- 
+
 });
 
 app.delete('/auth/delete-image', async (req, res) => {
@@ -646,11 +644,11 @@ app.delete('/auth/delete-image', async (req, res) => {
               const currentCount = userData.picturesUploaded;
               const newCount = currentCount - 1;
               console.log("New picture count:", newCount);
-              
+
               update(ref(database, 'users/' + decodedToken.uid), {
                 picturesUploaded: newCount
               })
-               
+
                 .catch((error) => {
                   console.error('Error updating picture count:', error);
                   return res.status(500).send("Adding picture failure");
