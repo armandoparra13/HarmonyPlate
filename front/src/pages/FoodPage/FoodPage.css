@@ -45,7 +45,10 @@
 }
 
 .food-page {
-    padding: 50px;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
 }
 
 .options {

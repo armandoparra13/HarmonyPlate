@@ -3,7 +3,7 @@ import './LoginPage.css';
 //import { signInWithEmailAndPassword } from 'firebase/auth';
 //import { auth } from '../../firebase';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/Auth'
+import { useAuth } from '../../Auth'
 
 function LoginPage() {
   const [loginFormActive, setLoginFormActive] = useState(false);
@@ -37,7 +37,7 @@ function LoginPage() {
     try {
       await login(email, password);
       console.log("worked");
-      navigate('/create-profile');
+      navigate('/homepage');
     } catch (error) {
       console.log('Error logging in:', error)
     }
@@ -48,7 +48,7 @@ function LoginPage() {
   }
 
   return (
-    <div>
+    <div className="loginContainer">
       <img className="bg-img" src="https://media.giphy.com/media/h7uTwqEHysbd2lhyDP/giphy.gif" />
 
       <div className="card">

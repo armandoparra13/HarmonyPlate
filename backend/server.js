@@ -1,6 +1,6 @@
 import express from 'express';
 import { initializeApp } from 'firebase/app';
-import { getDatabase, limitToFirst, ref, set, update, query, orderByKey, onValue, child} from "firebase/database";
+import { getDatabase, limitToFirst, ref, set, update, query, orderByKey, onValue, get} from "firebase/database";
 import env from './env_backend.json' assert { type: 'json' };
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import axios from 'axios';
@@ -12,33 +12,22 @@ import path from 'path';
 import multer from 'multer';
 import fs from 'fs';
 import bodyParser from 'body-parser';
-
-
+import 'dotenv/config'
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(bodyParser.json());
 
-let api_key = env['apiKey'];
-let domain = env['authDomain'];
-let db_url = env['databaseURL'];
-let project_id = env['projectId'];
-let storage_bucket = env['storageBucket'];
-let mess_sender = env['messagingSenderId'];
-let app_id = env['appId'];
-let measure_id = env['measurementId'];
-
-
 const firebaseConfig = {
-  apiKey: api_key,
-  authDomain: domain,
-  databaseURL: db_url,
-  projectId: project_id,
-  storageBucket: storage_bucket,
-  messagingSenderId: mess_sender,
-  appId: app_id,
-  measurementId: measure_id,
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  databaseURL: process.env.REACT_APP_FIREBASE_DATABASE_URL,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase, Realtime Database, Authentication
@@ -49,8 +38,22 @@ const auth = getAuth();
 const port = 5000;
 const hostname = "localhost";
 
+const serviceAccountConfig = {
+  "type": process.env.TYPE,
+  "project_id": process.env.PROJECT_ID,
+  "private_key_id": process.env.PRIVATE_KEY_ID,
+  "private_key": process.env.PRIVATE_KEY,
+  "client_email": process.env.CLIENT_EMAIL,
+  "client_id": process.env.CLIENT_ID,
+  "auth_uri": process.env.AUTH_URI,
+  "token_uri": process.env.TOKEN_URI,
+  "auth_provider_x509_cert_url": process.env.AUTH_PROVIDER,
+  "client_x509_cert_url": process.env.CLIENT_CERT_URL,
+  "universe_domain": process.env.UNIVERSE_DOMAIN
+}
+
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
+  credential: admin.credential.cert(serviceAccountConfig),
   databaseURL: "https://harmonyplate-68e8b-default-rtdb.firebaseio.com"
 });
 
@@ -81,13 +84,19 @@ app.post("/auth/signup", (req, res) => {
       // Signed in 
       //add user to Realtime Database (used to store user data other than login info)
       let user = userCredential.user;
+
+      let randomString = generateRandomString(10);
+
       set(ref(database, 'users/' + user.uid), {
         username: body.username,
         email: body.email,
         dateOfBirth: body.dateOfBirth,
         gender: body.gender,
+        picturesUploaded: 0,
         spotifyLinked: false,
-        foodsChosen: false
+        foodsChosen: false,
+        randomString: randomString
+        
       }).then(() => {
         return res.send("User creation successful");
       }).catch(() => {
@@ -231,34 +240,36 @@ app.get('/auth/token', (req, res) => {
 let spoonacularUrl = env["spoonacular_url"];
 let spoonacularApi = env["spoonacular_key"];
 
-app.get("/", (req, res) => {
-  res.send("HarmonyPlate API")
-})
 
-app.get("/api", (req, res) => {
-  res.json({ "users": ["userOne", "userTwo"] })
-})
 
-app.get("/auth/search", (req, res) => {
-  let query = req.query.query;
-  let cuisine = req.query.cuisine;
-  let diet = req.query.diet;
+app.get("/auth/search", async (req, res) => {
+  try {
+    const query = req.query.query;
+    const cuisine = req.query.cuisine;
+    const diet = req.query.diet;
 
-  console.log(req.query);
+    if (!query) {
+      return res.status(400).json({ error: "Invalid Query" });
+    }
 
-  if (!query) {
-    return res.status(400).send({ "error": "Invalid Query" });
+    if (!cuisine || cuisine === "") {
+      return res.status(400).json({ error: "No cuisine chosen" });
+    }
+
+    const url = `${spoonacularUrl}recipes/complexSearch?query=${query}&cuisine=${cuisine}${diet ? '&diet=' + diet : ''}&apiKey=${spoonacularApi}`;
+
+    const response = await axios.get(url);
+
+    if (response.data && response.data.results) {
+      return res.status(200).json({ options: response.data.results });
+    } else {
+      return res.status(500).json({ error: "Error fetching search results" });
+    }
+  } catch (error) {
+    console.error("Error during search:", error);
+    return res.status(500).json({ error: "An error occurred during the search" });
   }
-
-  if (!cuisine) {
-    return res.status(400).send({ "error": "No cuisine chosen" });
-  }
-  let url = `${spoonacularUrl}recipes/complexSearch?query=${query}&cuisine=${cuisine}${diet ? '&diet=' + diet : ''}&apiKey=${spoonacularApi}`
-  axios.get(url).then(response => {
-    console.log(url)
-    return res.status(200).send({ "options": response.data.results });
-  })
-})
+});
 
 app.post("/auth/foodChoice", async (req, res) => {
   // verify input is valid
@@ -268,24 +279,49 @@ app.post("/auth/foodChoice", async (req, res) => {
     !body.hasOwnProperty("chosenFood") ||
     body.chosenFood.trim() === ""
   ) {
-    return res.status(400).send("Invalid request.");
+    return res.status(400).send("No food chosen");
   }
 
-  console.log(body.chosenFood)
-  admin.auth()
-    .verifyIdToken(req.headers.authorization)
-    .then(decodedToken => {
-      update(ref(database, 'users/' + decodedToken.uid), {
-        food: { favoriteFood: body.chosenFood }
-      }).catch(() => {
-        console.log("Adding Favorite Food failed");
-        return res.status(500).send("Adding Favorite Food failure");
-      })
+  if (!body.hasOwnProperty("cuisine")) {
+    return res.status(400).json({
+      "error": "No cuisine chosen"
+    });
+  }
 
-    })
-    .catch(error => {
-      throw new Error('Error while verifying token:', error)
-    })
+  if (!body.hasOwnProperty("diet")) {
+    return res.status(400).json({
+      "error": "No diet chosen"
+    });
+  }
+
+  let food = body.chosenFood;
+  let diet = body.diet === "" ? "No preference" : body.diet;
+  let cuisine = body.cuisine;
+
+  console.log(food, diet, cuisine)
+  console.log(body.chosenFood)
+  admin
+  .auth()
+  .verifyIdToken(req.headers.authorization)
+  .then((decodedToken) => {
+    return update(ref(database, 'users/' + decodedToken.uid), {
+      food: {
+        favoriteFood: food,
+        diet: diet,
+        cuisine: cuisine
+      },
+      foodsChosen: true
+    });
+  })
+  .then(() => {
+    console.log('Adding Favorite Food succeeded');
+    //res.redirect('/create-profile');
+    return res.status(200).send('Food choice submitted successfully.');
+  })
+  .catch((error) => {
+    console.error('Error while processing food choice:', error);
+    return res.status(500).json('Food choice submission failed.');
+  });
 
 })
 
@@ -354,41 +390,74 @@ app.post('/auth/submit-desc', async (req, res) => {
 
 const pictureCounters = {};
 
+async function getUserRandomString(req) {
+  const token = req.headers.authorization?.split(' ')[1];
+  
+
+  try {
+    if(token) {
+      const decodedToken = await admin.auth().verifyIdToken(token);
+
+      const uid = decodedToken.uid;
+      const userRef = admin.database().ref(`/users/${uid}`);
+
+      const snapshot = await userRef.once('value');
+      const userData = snapshot.val();
+
+      if (userData && userData.randomString) {
+        return userData.randomString;
+
+        
+      } else {
+          console.log('User data not found');
+          return null;
+      }
+    }
+    
+  } catch (error) {
+    console.error('Error verifying ID token:', error);
+    return null;
+  }
+    
+
+  
+}
+
 //UPLOAD PICTURES
 const storage = multer.diskStorage({
   destination: async (req, file, cb) => {
     try {
-        const token = req.headers.authorization?.split(' ')[1];
-        const decodedToken = await admin.auth().verifyIdToken(token);
+      const userRandomString = await getUserRandomString(req);
+
+      const token = req.headers.authorization?.split(' ')[1];
+      const decodedToken = await admin.auth().verifyIdToken(token);
         
-        const userID = decodedToken.uid; 
+      const userID = decodedToken.uid; 
+      const userRef = ref(database, 'users/' + userID);
+      const userSnapshot = await get(userRef);
+      const user = userSnapshot.val();
 
         
-        const userFolderPath = path.join('../front/public/uploads', userID);
-        fs.mkdirSync(userFolderPath, { recursive: true });
+      const userFolderPath = path.join('../front/public/uploads', userRandomString);
+      fs.mkdirSync(userFolderPath, { recursive: true });
 
         //req.decodedToken = decodedToken;
-
-        cb(null, userFolderPath);
+      cb(null, userFolderPath);
     } catch (error) {
-        cb(error);
+      cb(error);
     }
 },
   filename: async (req, file, cb) => {
     try {
+      const userRandomString = await getUserRandomString(req);
       const fileExtension = path.extname(file.originalname);
-      const token = req.headers.authorization?.split(' ')[1];
-      const decodedToken = await admin.auth().verifyIdToken(token);
-      const userID = decodedToken.uid; 
-      //console.log(userID);
-      //console.log(token);
+  
+      //console.log('User Random String:', userRandomString);
+      const pictureNumber = pictureCounters[userRandomString] || 0; // Get the picture number for the user
 
-      const pictureNumber = pictureCounters[userID] || 0; // Get the picture number for the user
+      pictureCounters[userRandomString] = pictureNumber + 1;
 
-      // Increment the picture counter for the user
-      pictureCounters[userID] = pictureNumber + 1;
-
-      const uniqueFilename = `${userID}_${pictureNumber}${fileExtension}`;
+      const uniqueFilename = `${userRandomString}_${pictureNumber}${fileExtension}`;
 
       cb(null, uniqueFilename);
   } catch (error) {
@@ -403,11 +472,214 @@ const upload = multer({ storage });
 // Route to handle image upload
 app.post('/auth/upload', upload.single('image'), (req, res) => {
   if (req.file) {
-      res.json({ imageUrl: '/uploads/${req.file.filename}' });
+    console.log('File uploaded:', req.file);
+
+    const idToken = req.headers.authorization?.replace('Bearer ', '');
+    
+    admin.auth()
+      .verifyIdToken(idToken)
+      .then(async (decodedToken) => {
+        const userID = decodedToken.uid;
+        const userRef = ref(database, 'users/' + userID);
+     
+        const userSnapshot = await get(userRef);
+        const userData = userSnapshot.val();
+        console.log("pictures:", userData);
+
+        if (userData && userData.picturesUploaded !== undefined) {
+          const currentCount = userData.picturesUploaded;
+          const newCount = currentCount + 1;
+          console.log("New picture count:", newCount);
+          
+          update(ref(database, 'users/' + decodedToken.uid), {
+            picturesUploaded: newCount
+          })
+           
+            .catch((error) => {
+              console.error('Error updating picture count:', error);
+              return res.status(500).send("Adding picture failure");
+            });
+        } else {
+          console.error("User data is missing picturesUploaded.");
+          return res.status(500).send("User data is missing picturesUploaded.");
+        }
+      })
+      .catch((error) => {
+        console.error('Error verifying token:', error);
+        return res.status(500).send('Error verifying token');
+      });
   } else {
-      res.status(400).json({ message: 'No file uploaded' });
+    console.error('No file uploaded');
+    res.status(400).json({ message: 'No file uploaded' });
   }
 });
+
+async function fetchUserData(req, res, next) {
+  const idToken = req.headers.authorization?.replace('Bearer ', '');
+
+  try {
+    if (idToken) {
+   
+      const decodedToken = await admin.auth().verifyIdToken(idToken);
+      const uid = decodedToken.uid;
+      const userRef = admin.database().ref(`/users/${uid}`);
+
+      // Fetch user data
+      userRef.once('value', (snapshot) => {
+        const userData = snapshot.val();
+        if (userData) {
+          const spotifyLinked = userData.spotifyLinked || false;
+          const foodsChosen = userData.foodsChosen || false;
+          const picturesUploaded = userData.picturesUploaded || 0;
+          
+          // Store user data in the request object
+          req.userData = {
+            picturesUploaded,
+            spotifyLinked,
+            foodsChosen,
+          };
+          next();
+        } else {
+          console.error('User data not found');
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Error verifying ID token:', error);
+  }
+}
+
+app.get('/auth/fetch-user-data', fetchUserData, (req, res) => {
+  if (req.userData) {
+    // Respond with user data
+    res.json(req.userData);
+  } else {
+ 
+    console.error('Unauthorized or user data not found');
+    res.status(401).json({ error: 'Unauthorized' });
+  }
+});
+
+app.get('/auth/fetch-user-images', async (req, res) => {
+ 
+  const idToken = req.headers.authorization?.replace('Bearer ', '');
+
+  try {
+    if (idToken) {
+  
+      const decodedToken = await admin.auth().verifyIdToken(idToken);
+      const uid = decodedToken.uid;
+      const userRef = admin.database().ref(`/users/${uid}`);
+
+      // Fetch user data
+      userRef.once('value', (snapshot) => {
+        const userData = snapshot.val();
+        if (userData) {
+        
+          const randomString = userData.randomString || '';
+         
+          const userImagesDirectory = path.join('../front/public/uploads', randomString);
+
+          if (fs.existsSync(userImagesDirectory)) {
+          
+            fs.readdir(userImagesDirectory, (err, files) => {
+              if (err) {
+                console.error('Error reading user images directory:', err);
+                res.status(500).json({ error: 'Internal server error' });
+              } else {
+                // Filter files based on the naming convention 'randomstring
+                const userImages = files.filter((file) => file.startsWith(`${randomString}_`));
+        
+                // Construct URLs for the images
+                const imageUrls = userImages.map((image) => `/uploads/${randomString}/${image}`);
+        
+                res.json({ imageUrls });
+              }
+            });
+          } else {
+ 
+            res.json({ imageUrls: [] });
+          }
+        } else {
+          console.error('User data not found');
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Error verifying ID token:', error);
+  }
+ 
+});
+
+app.delete('/auth/delete-image', async (req, res) => {
+  const idToken = req.headers.authorization?.replace('Bearer ', '');
+  const imageUrlToDelete = req.body.imageUrl;
+  console.log("delete:", imageUrlToDelete);
+
+  try {
+    if (!idToken || !imageUrlToDelete) {
+      return res.status(400).json({ error: 'Invalid request.' });
+    }
+
+    // Verify the user's ID token
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const uid = decodedToken.uid;
+    const userRef = admin.database().ref(`/users/${uid}`);
+
+    // Fetch user data
+    userRef.once('value', async (snapshot) => {
+      const userData = snapshot.val();
+      if (userData) {
+        const randomString = userData.randomString || '';
+        //const userImagesDirectory = path.join('../front/public/uploads', randomString);
+
+        if (fs.existsSync('../front/public')) {
+
+          const imageFilePath = path.join('../front/public', imageUrlToDelete);
+
+          if (fs.existsSync(imageFilePath)) {
+            // Delete the image file
+            console.log('yuh');
+            fs.unlinkSync(imageFilePath);
+            console.log(`Deleted image: ${imageFilePath}`);
+            if (userData && userData.picturesUploaded !== undefined) {
+              const currentCount = userData.picturesUploaded;
+              const newCount = currentCount - 1;
+              console.log("New picture count:", newCount);
+              
+              update(ref(database, 'users/' + decodedToken.uid), {
+                picturesUploaded: newCount
+              })
+               
+                .catch((error) => {
+                  console.error('Error updating picture count:', error);
+                  return res.status(500).send("Adding picture failure");
+                });
+            } else {
+              console.error("User data is missing picturesUploaded.");
+              return res.status(500).send("User data is missing picturesUploaded.");
+            }
+
+            res.status(200).json({ message: 'Image deleted successfully.' });
+          } else {
+            console.error(`Image not found: ${imageFilePath}`);
+            res.status(404).json({ error: 'Image not found.' });
+          }
+        } else {
+          console.error('User images directory not found.');
+          res.status(500).json({ error: 'Internal server error.' });
+        }
+      } else {
+        console.error('User data not found.');
+        res.status(500).json({ error: 'Internal server error.' });
+      }
+    });
+  } catch (error) {
+    console.error('Error verifying ID token:', error);
+    res.status(401).json({ error: 'Unauthorized' });
+  }
+});
+
 
 app.listen(port, hostname, () => {
   console.log(`http://${hostname}:${port}`);

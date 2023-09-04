@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './SignUpPage.css';
 import axios from 'axios';
-import { useAuth } from '../../contexts/Auth'
+import { useAuth } from '../../Auth'
 import { useNavigate } from 'react-router-dom';
 
 const SignUp = () => {
@@ -49,7 +49,7 @@ const SignUp = () => {
             console.log(response.data);
             try {
                 await login(formData.email, formData.password);
-                navigate('/food')
+                navigate('/upload-pictures');
             } catch (error) {
                 console.log('Error logging in:', error)
             }
@@ -58,8 +58,10 @@ const SignUp = () => {
         }
     };
 
+   
+
     return (
-        <div className="container">
+        <div className="signUpContainer">
             <h2>Harmony Plate Sign Up</h2>
             <form onSubmit={handleSubmit}>
                 <div className="input-group">

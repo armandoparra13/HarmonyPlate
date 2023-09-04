@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import "./FoodPage.css"
-import { useAuth } from '../../contexts/Auth';
+import { useAuth } from '../../Auth';
 import axios from 'axios';
+import { useNavigate } from "react-router-dom";
 
-function FoodPage() {
+function FoodPage({ setUserData, setLoadingUserData }) {
     const { currentUser } = useAuth();
     const [keyword, setKeyword] = useState('');
     const [cuisine, setCuisine] = useState('');
@@ -12,10 +13,37 @@ function FoodPage() {
     const [errorMessage, setErrorMessage] = useState('');
     const [options, setOptions] = useState([]);
     const [optionChosen, setOptionChosen] = useState('');
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+
+
+    const fetchUserData = async () => {
+        if (currentUser) {
+            try {
+                const response = await axios.get('/auth/fetch-user-data', {
+                    headers: {
+                        Authorization: `Bearer ${currentUser.accessToken}`,
+                    },
+                });
+                console.log(response.data);
+                setUserData(response.data);
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+            finally {
+                setLoadingUserData(false);
+            }
+        }
+    };
+
+    useEffect(() => {
+        fetchUserData();
+    }, [currentUser]);
 
     const onSubmit = (e) => {
         e.preventDefault();
         setOptionChosen([]);
+
 
         fetch(`/auth/search?query=${keyword}&cuisine=${cuisine}&diet=${diet}`)
             .then((response) => {
@@ -23,7 +51,7 @@ function FoodPage() {
             })
             .then((data) => {
                 if (data.error) {
-                    setValidSearch(true);
+                    setValidSearch(false);
                     setErrorMessage(data.error);
                 } else {
                     setValidSearch(true);
@@ -43,22 +71,45 @@ function FoodPage() {
             previouslySelected.classList.remove('selected-option');
         }
         e.currentTarget.classList.add('selected-option');
-        setOptionChosen(e.target.id);
+        setOptionChosen(e.currentTarget.id); //changed target 
+        console.log(e.currentTarget.id);
     }
 
-    const submitChoice = (e) => {
-        if (options.length === 0 || optionChosen) {
-            console.log(optionChosen);
-            axios.post('/auth/foodChoice',
-                { chosenFood: optionChosen },
+    const submitChoice = () => {
+        console.log(optionChosen);
+
+
+        if (optionChosen !== '') {
+
+            console.log('hi');
+            axios.post(
+                '/auth/foodChoice',
+                {
+                    chosenFood: optionChosen,
+                    cuisine: cuisine,
+                    diet: diet,
+                    foodsChosen: true
+                },
                 {
                     headers: {
                         authorization: currentUser.accessToken,
                     },
-                })
-        }
+                }
+            ).then(() => {
+                console.log('Food choice submitted successfully.');
 
-    }
+                fetchUserData();
+                navigate('/create-profile');
+
+
+            }).catch(error => {
+                console.error('Error submitting food choice:', error);
+
+            });
+        }
+    };
+
+
 
     return (
         <div className="food-page">
@@ -79,7 +130,7 @@ function FoodPage() {
                 <select
                     className="custom-food-select"
                     name="cuisine"
-                    onClick={(e) => (
+                    onChange={(e) => (
                         setCuisine(e.target.value)
                     )}
                 >
@@ -116,7 +167,7 @@ function FoodPage() {
             <div className="input-group">
                 <label>Choose a diet (or you can leave it blank):</label>
                 <select
-                    className="custom-select"
+                    className="custom-food-select"
                     name="diet"
                     onClick={(e) => (
                         setDiet(e.target.value))}
@@ -153,6 +204,7 @@ function FoodPage() {
             </div>
 
             {validSearch && <button className="input-group-button" onClick={submitChoice}>Finish</button>}
+
         </div >
     );
 }
