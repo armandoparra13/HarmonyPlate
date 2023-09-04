@@ -1,19 +1,6 @@
 /* UserProfilePage.css */
 
-/* Reset margin and padding for html and body elements */
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-}
-
 /* Set up a flex container to fill the viewport */
-body {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
-}
 
 /* Ensure the grid container fills the available vertical space */
 .grid-container {
@@ -27,7 +14,7 @@ body {
   padding: 20px;
   flex-grow: 1; /* Grow to fill available space vertically */
   height: 80vh;
-  width: 900px;
+  width: 95%;
 }
 
 /* Style for left column */
@@ -47,26 +34,32 @@ body {
 
 /* Style for right column */
 .right-column {
-  align-items: center; /* Center content vertically within the right column */
-  justify-content: center; /* Center content horizontally within the right column */
-  text-align: center;
+  align-items: center; /* Center align the content horizontally */
   grid-column: 2; /* Right column */
   padding: 40px;
+  
 }
 
-/* Style for user image */
-.user-image {
-  max-width: 100%; /* Adjust the image size as needed */
-  height: auto;
-}
+.first-row {
+    display: flex; /* Create a flex container */
+    flex-direction: row; /* Display children elements in a row */
+    justify-content: flex-start; /* Align children elements to the start of the container (left-aligned) */
+    align-items: center; /* Vertically center the children elements */
+  }
+  
+  .image-container {
+    margin-right: 10px; /* Add some margin between the images */
+  }
+  
+  /* Adjust the image size as needed */
+  .images-displayed {
+    max-width: 200px; /* Set a maximum width for the images */
+    height: auto; /* Maintain the aspect ratio */
+  }
+  
 
-.text-box {
-  background-color: #FFFFFF;
-  border-radius: 5px;
-  width: 100%; /* Set the width of the text box relative to the left column's width */
-  height: 400px;
-  padding: 20px; /* Add padding to the text box as needed */
-  width: 70%;
-  height: auto;
-  border-radius: 30px;
-}
+  .favorite-dish {
+    max-width: 50px; /* Set a maximum width for the image */
+    height: auto; /* Maintain the aspect ratio */
+    margin-top: 20px; /* Add some top margin to separate it from other content */
+  }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '../../contexts/Auth';
+import { useAuth } from '../../Auth';
 import axios from 'axios';
 import './UserProfilePage.css';
 
@@ -8,6 +8,7 @@ function UserProfilePage() {
     const { currentUser } = useAuth();
     const [favoriteFoodImage, setFavoriteFoodImage] = useState(null);
     const [favoriteFoodTitle, setFavoriteFoodTitle] = useState(null);
+    const [imageUrls, setImageUrls] = useState([]);
 
     useEffect(() => {
         // Function to fetch user data
@@ -23,6 +24,7 @@ function UserProfilePage() {
 
                 // Fetch favorite dish data
                 favoriteDish(response.data.food.favoriteFood);
+                fetchUserImages();
             } catch (error) {
                 console.error("Error fetching user data:", error);
             }
@@ -43,8 +45,27 @@ function UserProfilePage() {
                 });
         }
 
+        const fetchUserImages = async () => {
+            try {
+              const response = await axios.get('/auth/fetch-user-images', {
+                headers: {
+                  Authorization: `Bearer ${currentUser.accessToken}`,
+                },
+              });
+              if (response.data) {
+                setImageUrls(response.data.imageUrls);
+                console.log(response.data.imageUrls);
+              }
+              
+            } catch (error) {
+              console.error('Error fetching user images:', error);
+            }
+          };
+
         fetchUserData();
     }, [currentUser.accessToken]);
+
+    
 
     return (
         <div className='grid-container'>
@@ -52,7 +73,13 @@ function UserProfilePage() {
                 {userData ? (
                     <div>
                         <div className="first-row">
-                            <img src="/uploads/abcdef/world-s-cutest-kitten.jpg" alt="upload" className="user-image" />
+                        {imageUrls.map((imageUrl, index) => (
+                        <div key={index} className="image-container">
+                            <div className="image-wrapper">
+                            <img src={imageUrl} alt={`User Image ${index}`} className="images-displayed" />
+                        </div>
+                    </div>
+                    ))}
                         </div>
                         <div className="second-row">
                             <h2>{userData.username}</h2>
@@ -89,8 +116,7 @@ function UserProfilePage() {
                         <div className="input-group">
                             <label>Favorite Dish</label>
                             <input className="custom-input" disabled value={favoriteFoodTitle} />
-                        </div>
-                        <img src={favoriteFoodImage} alt="Favorite Dish" />                       
+                        </div>                     
                     </div>
                 ) : null}
             </div>
