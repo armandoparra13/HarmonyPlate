@@ -407,7 +407,8 @@ app.get("/auth/getMatchesInfo", async (req, res) => {
           "gender": matchSnap.gender || null,
           "cuisine": matchSnap.food ? matchSnap.food.cuisine : null,
           "artist": matchSnap.spotify ? matchSnap.spotify.artistNames[0] : null,
-          "images": images
+          "images": images,
+          "path": matchSnap.randomString ? matchSnap.randomString : null
         };
 
         matchList.push(matchInfo);

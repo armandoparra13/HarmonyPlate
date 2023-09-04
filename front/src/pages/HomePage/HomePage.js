@@ -63,7 +63,8 @@ const HomePage = () => {
                         <button className="like-btn" onClick={handleLike}>Like</button>
                         <div className="match-info">
                             <div className="match-card-content">
-                                {/* <img src="/uploads/PQ5oYgHbPd/PQ5oYgHbPd_1.png" className="match-card-image" /> */}
+                                {matches[currentMatchIndex].randomString && matches[currentMatchIndex].images && matches[currentMatchIndex].randomString.length === 0 ?
+                                    (<img src="/uploads/PQ5oYgHbPd_1.png" className="match-card-image" />) : (<div>No Image</div>)}
                                 <h2 className="match-card-title">{matches[currentMatchIndex].name}</h2>
                                 <p className="match-card-description">{matches[currentMatchIndex].description}</p>
                                 <p className="match-card-food">Favorite Cuisine: {matches[currentMatchIndex].cuisine}</p>
