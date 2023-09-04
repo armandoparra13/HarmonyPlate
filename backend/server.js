@@ -1,11 +1,9 @@
 import express from 'express';
 import { initializeApp } from 'firebase/app';
 import { getDatabase, limitToFirst, ref, set, update, query, orderByKey, onValue, get} from "firebase/database";
-import env from './env_backend.json' assert { type: 'json' };
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import axios from 'axios';
 import admin from 'firebase-admin';
-import serviceAccount from "./serviceAccount.json" assert { type: 'json' };
 import cors from 'cors';
 import request from 'request';
 import path from 'path';
@@ -114,9 +112,9 @@ app.post("/auth/signup", (req, res) => {
 
 //SPOTIFY
 
-let CLIENT_ID = env["spotifyClientID"];
-let REDIRECT_URI = env["spotifyRedirectURI"];
-let CLIENT_SECRET = env["spotifyClientSecret"];
+let CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
+let REDIRECT_URI = process.env.REDIRECT_URI;
+let CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 
 var generateRandomString = function (length) {
     var text = '';
@@ -237,8 +235,8 @@ app.get('/auth/token', (req, res) => {
     //console.log(res.json());
   })
 
-let spoonacularUrl = env["spoonacular_url"];
-let spoonacularApi = env["spoonacular_key"];
+let spoonacularUrl = process.env.SPOONACULAR_URL;
+let spoonacularApi = process.env.SPOONACULAR_API;
 
 
 
