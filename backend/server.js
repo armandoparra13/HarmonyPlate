@@ -368,6 +368,10 @@ app.get("/auth/getMatchesInfo", async (req, res) => {
       });
     });
 
+    // update(ref(database, 'users/' + decodedToken.uid), {
+    //   pool: ['FI7ZyNmZSrRLbUoy8q7GPf4cG5I2', 'M2n00HNm0fY236JDqfKRZFWKxwG3']
+    // })
+
     const matchList = [];
 
     // Use Promise.all to fetch data for all matches concurrently rather than one at a time
@@ -411,7 +415,6 @@ app.get("/auth/getMatchesInfo", async (req, res) => {
     } else {
       return res.status(500).json("No pool");
     }
-    console.log(matchList)
     return res.status(200).json(matchList);
   } catch (error) {
     console.error(error);
@@ -419,9 +422,24 @@ app.get("/auth/getMatchesInfo", async (req, res) => {
   }
 });
 
+async function fillPoolFromDatabase(usersSnapshots, currentPool, decodedToken) {
+  return new Promise((resolve, reject) => {
+    onValue(usersSnapshots, (snapshot) => {
+      snapshot.forEach((childSnapshot) => {
+        const childKey = childSnapshot.key;
+        if (decodedToken.uid !== childKey) {
+          currentPool.push(childKey);
+        }
+      });
+      resolve(currentPool); // Resolve the promise when done
+    }, (error) => {
+      reject(error); // Reject the promise on error
+    });
+  });
+}
+
 app.post("/auth/addMatch", async (req, res) => {
   try {
-    console.log("Inside add Match")
     const decodedToken = await admin.auth().verifyIdToken(req.headers.authorization);
     const usersSnapshot = await ref(database, 'users/' + decodedToken.uid);
     const userSnap = await new Promise((resolve, reject) => {
@@ -431,13 +449,19 @@ app.post("/auth/addMatch", async (req, res) => {
         reject(error);
       });
     });
-    console.log("Liked");
     let currentPool = userSnap.pool ? userSnap.pool : [];
     let currentMatched = userSnap.matched ? userSnap.matched : [];
-    console.log(currentPool);
     let liked = currentPool.shift();
-    console.log(liked);
     currentMatched.push(liked)
+
+    if (currentPool.length === 1) {
+      let usersSnapshots = query(ref(database, 'users'), orderByKey(), limitToFirst(10));
+      try {
+        await fillPoolFromDatabase(usersSnapshots, currentPool, decodedToken);
+      } catch (error) {
+        console.log("Error filling the pool")
+      }
+    }
     update(ref(database, 'users/' + decodedToken.uid), {
       pool: currentPool,
       matched: currentMatched
@@ -468,6 +492,16 @@ app.post("/auth/addIgnored", async (req, res) => {
     let currentIgnored = userSnap.ignored ? userSnap.ignored : [];
     let skipped = currentPool.shift();
     currentIgnored.push(skipped)
+    if (currentPool.length === 1) {
+      let usersSnapshots = query(ref(database, 'users'), orderByKey(), limitToFirst(10));
+      try {
+        await fillPoolFromDatabase(usersSnapshots, currentPool, decodedToken);
+      } catch (error) {
+        console.error("Error filling the pool from the database:", error);
+        // Handle the error appropriately
+      }
+    }
+
     update(ref(database, 'users/' + decodedToken.uid), {
       pool: currentPool,
       ignored: currentIgnored

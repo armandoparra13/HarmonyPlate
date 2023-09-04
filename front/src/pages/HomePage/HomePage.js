@@ -9,30 +9,16 @@ const HomePage = () => {
     const [matches, setMatches] = useState([]);
     const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
     const [error, setError] = useState('');
-    console.log(currentMatchIndex, "-----", matches.length)
     const fetchUserData = async () => {
-        console.log("here")
         if (currentUser) {
             try {
-                if (matches || currentMatchIndex >= matches.length / 2) {
-                    try {
-                        await axios.get('/auth/getMatches',
-                            {
-                                headers: {
-                                    authorization: currentUser.accessToken,
-                                },
-                            });
-                    } catch (error) {
-                        console.error('Error updating pool:', error);
-                        setError('No more matches 1')
-                    }
-                }
                 const response = await axios.get('/auth/getMatchesInfo', {
                     headers: {
                         Authorization: currentUser.accessToken,
                     },
                 });
-                setMatches(matches.concat(response.data))
+                setMatches(response.data)
+                setCurrentMatchIndex(0);
             } catch (error) {
                 console.error('Error fetching matches data:', error);
                 setError('No more matches')
@@ -41,34 +27,36 @@ const HomePage = () => {
     };
 
     useEffect(() => {
-        if (!matches || currentMatchIndex >= matches.length / 2)
+        if (!matches || currentMatchIndex >= matches.length)
             fetchUserData()
     }, [matches, currentMatchIndex]);
 
-    const handleLike = async () => {
-        console.log("Liked")
+    const handleLike = () => {
         setCurrentMatchIndex(currentMatchIndex + 1);
-        await axios.post("/auth/addMatch",
+        axios.post("/auth/addMatch",
             {},
             {
                 headers: {
                     Authorization: currentUser.accessToken,
                 },
+            }).catch(e => {
+                console("Handle Like", e)
             });
     }
-    const handleSkip = async () => {
-        console.log("Skipped")
+    const handleSkip = () => {
         setCurrentMatchIndex(currentMatchIndex + 1);
-        await axios.post("/auth/addIgnored",
+        axios.post("/auth/addIgnored",
             {},
             {
                 headers: {
                     Authorization: currentUser.accessToken,
                 },
+            }).catch(e => {
+                console("Handle Skip", e)
             });
     }
     return matches.length !== 0 ?
-        matches ?
+        matches[currentMatchIndex] ?
             (<div className="main-content">
                 <div className="match-box">
                     <div className="match-card" key={currentMatchIndex}>
@@ -77,7 +65,7 @@ const HomePage = () => {
                             <div className="match-card-content">
                                 {/* <img src="/uploads/PQ5oYgHbPd/PQ5oYgHbPd_1.png" className="match-card-image" /> */}
                                 <h2 className="match-card-title">{matches[currentMatchIndex].name}</h2>
-                                <p className="match-card-description">{matches[currentMatchIndex].description}y</p>
+                                <p className="match-card-description">{matches[currentMatchIndex].description}</p>
                                 <p className="match-card-food">Favorite Cuisine: {matches[currentMatchIndex].cuisine}</p>
                                 <p className="match-card-artist">Favorite Artist: {matches[currentMatchIndex].artist}</p>
                             </div>
