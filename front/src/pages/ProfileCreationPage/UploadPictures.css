@@ -1,14 +1,12 @@
-.pictures-container{
-    text-align: center;
-    align-items: center;
-    justify-content: center;
-    padding: 30px;
+.header {
+    justify-content: space-between;
+    display: flex;
 }
 
 /* UploadPictures.css */
 
 .pictures-creation-container {
-    max-width: 600px;
+    max-width: 900px;
     margin: 0 auto;
     padding: 20px;
     background-color: #8fb0a8;
@@ -19,18 +17,25 @@
     justify-content: center;
     text-align: center;
     margin-top: 100px;
+    margin-right: 20px;
     
   }
   
   .pictures-creation-container h1 {
     font-size: 24px;
     margin-bottom: 20px;
+    
   }
   
-  .profile-description h2 {
+  .profile-description h3 {
     font-size: 18px;
     margin-bottom: 10px;
     font-family: 'Poppins', sans-serif;
+
+  }
+  .add-desc {
+    font-size: 20px;
+    
   }
   
   .profile-description textarea {
@@ -50,27 +55,43 @@
     border-radius: 5px;
     cursor: pointer;
     text-align: center;
-    margin-left: 400px;
+    margin-left: -20px;
   }
   
   .uploaded-images h2 {
-    font-size: 18px;
+    font-size: 16px;
     margin-bottom: 10px;
+  }
+
+  .upload-pics-header {
+    font-size: 20px;
+    margin-top: 23px;
+    margin-right:30px;
   }
   
   .uploaded-images input[type="file"] {
-    display: none;
+    margin-top: 10px;
+    padding: 10px 20px;
+
+    color: black;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
   }
   
   .uploaded-images button {
-    margin-top: 10px;
-    padding: 10px 20px;
+    margin-top: 13px;
+    padding: 0px;
+    width:100px;
+    height: 33px;
     background-color: #F5CAC3;
     color: black;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-weight: 600;
+    margin-right: 40px;
    
   }
   
@@ -78,10 +99,62 @@
     font-size: 14px;
     color: #4e4d4d;
     margin-top: 10px;
+ 
+    flex: 1;
   }
   
   button:disabled {
     background-color: #dbc0c0;
     cursor: not-allowed;
   }
+
+  .images-displayed {
+    max-width: 200px;
+    max-height:200px;
+    object-fit: cover;
+
+    margin-top: 50px;
+  }
+
+  .image-container {
+    position: relative;
+  }
+
+  .image-wrapper {
+    position: relative;
+    display: inline-block;
+  }
   
+  .delete-button {
+    position: absolute;
+  
+  right: 0;
+  background-color: rgba(255, 0, 0, 0.7); 
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px; 
+  height: 24px;
+  cursor: pointer;
+  z-index: 1;
+  margin-top: 50px;
+  }
+
+  .text-box {
+    width:50px;
+  }
+
+  .side-by-side {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .upload-buttons {
+  
+    display: flex;
+  }
+
+  .choose-button {
+    margin-right: -10px;
+  }
+

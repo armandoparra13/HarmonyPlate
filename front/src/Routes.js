@@ -88,7 +88,9 @@ export const AppRoutes = () => {
                   path="/food"
                   element={
                     isUserDataComplete ? (
+                      <Sidebar>
                       <Navigate to="/homepage" />
+                      </Sidebar>
                     ) : (
                       <FoodPage setUserData={setUserData}
                         setLoadingUserData={setLoadingUserData} />

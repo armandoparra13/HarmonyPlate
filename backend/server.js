@@ -609,6 +609,76 @@ app.get('/auth/fetch-user-images', async (req, res) => {
  
 });
 
+app.delete('/auth/delete-image', async (req, res) => {
+  const idToken = req.headers.authorization?.replace('Bearer ', '');
+  const imageUrlToDelete = req.body.imageUrl;
+  console.log("delete:", imageUrlToDelete);
+
+  try {
+    if (!idToken || !imageUrlToDelete) {
+      return res.status(400).json({ error: 'Invalid request.' });
+    }
+
+    // Verify the user's ID token
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const uid = decodedToken.uid;
+    const userRef = admin.database().ref(`/users/${uid}`);
+
+    // Fetch user data
+    userRef.once('value', async (snapshot) => {
+      const userData = snapshot.val();
+      if (userData) {
+        const randomString = userData.randomString || '';
+        //const userImagesDirectory = path.join('../front/public/uploads', randomString);
+
+        if (fs.existsSync('../front/public')) {
+
+          const imageFilePath = path.join('../front/public', imageUrlToDelete);
+
+          if (fs.existsSync(imageFilePath)) {
+            // Delete the image file
+            console.log('yuh');
+            fs.unlinkSync(imageFilePath);
+            console.log(`Deleted image: ${imageFilePath}`);
+            if (userData && userData.picturesUploaded !== undefined) {
+              const currentCount = userData.picturesUploaded;
+              const newCount = currentCount - 1;
+              console.log("New picture count:", newCount);
+              
+              update(ref(database, 'users/' + decodedToken.uid), {
+                picturesUploaded: newCount
+              })
+               
+                .catch((error) => {
+                  console.error('Error updating picture count:', error);
+                  return res.status(500).send("Adding picture failure");
+                });
+            } else {
+              console.error("User data is missing picturesUploaded.");
+              return res.status(500).send("User data is missing picturesUploaded.");
+            }
+
+            res.status(200).json({ message: 'Image deleted successfully.' });
+          } else {
+            console.error(`Image not found: ${imageFilePath}`);
+            res.status(404).json({ error: 'Image not found.' });
+          }
+        } else {
+          console.error('User images directory not found.');
+          res.status(500).json({ error: 'Internal server error.' });
+        }
+      } else {
+        console.error('User data not found.');
+        res.status(500).json({ error: 'Internal server error.' });
+      }
+    });
+  } catch (error) {
+    console.error('Error verifying ID token:', error);
+    res.status(401).json({ error: 'Unauthorized' });
+  }
+});
+
+
 app.listen(port, hostname, () => {
   console.log(`Server is running at http://${hostname}:${port}`);
 });

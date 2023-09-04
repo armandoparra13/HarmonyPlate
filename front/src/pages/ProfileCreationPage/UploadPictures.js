@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from 'axios';
 import { useAuth } from '../../Auth';
 import { useNavigate } from 'react-router-dom';
@@ -7,25 +7,22 @@ import './UploadPictures.css'
 function UploadPictures({ setUserData, setLoadingUserData }) {
   const { currentUser } = useAuth();
   const [selectedImage, setSelectedImage] = useState(null);
-  const [selectedImage2, setSelectedImage2] = useState(null);
-  const [selectedImage3, setSelectedImage3] = useState(null);
+  const fileInputRef = useRef(null);
   const navigate = useNavigate();
   let [description, setDescription] = useState('');
   const [uploadedPicturesCount, setUploadedPicturesCount] = useState(0); 
   const [uploading, setUploading] = useState(false);
-  const [uploading2, setUploading2] = useState(false);
-  const [uploading3, setUploading3] = useState(false);
-  const [imagePlaceholders, setImagePlaceholders] = useState([]);
+
   const [imageUrls, setImageUrls] = useState([]);
 
   useEffect(() => {
-    // Fetch initial value for uploadedPicturesCount when the component mounts
-    fetchUserData();
-    //fetchUserImages();
+
+    //fetchUserData();
+    fetchUserImages();
   }, [uploading]);
 
 
-/*
+
   const fetchUserImages = async () => {
     try {
       const response = await axios.get('/auth/fetch-user-images', {
@@ -43,7 +40,7 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
     }
   };
 
-*/
+
 
   const fetchUserData = async () => {
     if (currentUser) {
@@ -73,6 +70,7 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
   };
 
   const handleDescChange = (event) => {
+    console.log("FHJDSF");
     setDescription(event.target.value);
   }
 
@@ -100,15 +98,19 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
     setSelectedImage(event.target.files[0]);
   };
 
+  
+
+  const handleImageUpload = async (e) => {
 
 
-  const handleImageUpload = async () => {
-    console.log("handleImageUpload1 clicked");
-
+    //e.preventDefault(); 
     if (!selectedImage || !currentUser) {
+      console.log('ok');
+      console.log('selectedImage:', selectedImage);
       return;
     }
-    console.log("handleImageUpload1 clicked");
+  
+
   
     console.log('yuh');
     setUploading(true);
@@ -123,22 +125,38 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
           Authorization: `Bearer ${currentUser.accessToken}`,
         },
       });
-
+      
       const updatedPicCount = response.data.picturesCount;
-      fetchUserData();
-
+      
 
     } catch (error) {
       console.error(error);
     } finally {
       setUploading(false);
+      fetchUserImages();
+      fetchUserData();
     }
   };
 
- 
+  const handleDeleteImage = async (imageUrl) => {
+  
+    try {
+      await axios.delete('/auth/delete-image', {
+        headers: {
+          Authorization: `Bearer ${currentUser.accessToken}`,
+        },
+        data: { imageUrl }, // Pass the URL of the image to be deleted
+      });
+
+      fetchUserImages();
+      fetchUserData();
+    } catch (error) {
+      console.error('Error deleting image:', error);
+    }
+  }
 
   const handleNextClick = () => {
-    // Navigate to a different page 
+
     
     if (uploadedPicturesCount >= 3 ) {
       navigate("/spotify-login");
@@ -149,31 +167,61 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
 
   return (
     <div className="pictures-creation-container">
-      
-        <h2>Add a description about yourself:</h2>
+      <div className="header">
+        <h3 className="add-desc">Add a description about yourself:</h3>
+        <h2 className="upload-pics-header">Upload profile pictures:</h2>
+      </div>
+        <div className="side-by-side">
         <div className="profile-description">
-        <form onSubmit={handleDescSubmit}>
-          <label>
+          <form onSubmit={handleDescSubmit}>
+            <label>
             
-            <textarea
-              value={description}
-              onChange={handleDescChange}
-              rows="4"
-              cols="50"
-              placeholder="Write something about yourself..."
-            />
-          </label>
-          <button type="submit">Save Description</button>
-        </form>
+              <textarea
+                style={{ float:'left', width: '400px', height: '70px'}}
+                value={description}
+                onChange={handleDescChange}
+                rows="4"
+                cols="50"
+                placeholder="Write something about yourself..."
+              />
+            </label>
+            <button type="submit">Save Description</button>
+          </form>
         </div>
       
+      
       <div className="uploaded-images">
-      <h2>Upload profile pictures!</h2>
-      <input type="file" accept="image/*" onChange={handleImageChange} />
-      <button onClick={handleImageUpload} >Upload Images</button>
-
-      <p>Please upload at least 3 pictures to continue.</p>
+        <div className="upload-buttons">
+        <input
+          className="choose-button"
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+    
+        />
+     
+        <button type="button" onClick={handleImageUpload} >Upload Image</button>
+        </div>
+        <p>Please upload at least 3 pictures to continue.</p>
       </div>
+      </div>
+  
+      <div>
+        {imageUrls.map((imageUrl, index) => (
+          <div key={index} className="image-container">
+            <div className="image-wrapper">
+            <img src={imageUrl} alt={`User Image ${index}`} className="images-displayed" />
+            <button
+              className="delete-button"
+              onClick={() => handleDeleteImage(imageUrl)}
+            >
+              X
+            </button>
+          </div>
+          </div>
+        ))}
+      </div>
+      
       <button onClick={handleNextClick} disabled={(uploadedPicturesCount < 3)}>Next</button>
       
     </div>
