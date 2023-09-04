@@ -21,9 +21,11 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
   useEffect(() => {
     // Fetch initial value for uploadedPicturesCount when the component mounts
     fetchUserData();
-    fetchUserImages();
+    //fetchUserImages();
   }, [uploading]);
 
+
+/*
   const fetchUserImages = async () => {
     try {
       const response = await axios.get('/auth/fetch-user-images', {
@@ -41,7 +43,7 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
     }
   };
 
-
+*/
 
   const fetchUserData = async () => {
     if (currentUser) {
@@ -146,33 +148,32 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
   };
 
   return (
-    <div className="pictures-container">
-      <div>
+    <div className="pictures-creation-container">
+      
         <h2>Add a description about yourself:</h2>
+        <div className="profile-description">
         <form onSubmit={handleDescSubmit}>
           <label>
-            Profile Description:
+            
             <textarea
               value={description}
               onChange={handleDescChange}
               rows="4"
               cols="50"
+              placeholder="Write something about yourself..."
             />
           </label>
           <button type="submit">Save Description</button>
         </form>
-      </div>
-      <button onClick={fetchUserImages}>Fetch User Images</button>
-      <div>
-        {imageUrls.map((imageUrl, index) => (
-          <img key={index} src={imageUrl} alt={`User Image ${index}`} />
-        ))}
-      </div>
+        </div>
+      
+      <div className="uploaded-images">
       <h2>Upload profile pictures!</h2>
       <input type="file" accept="image/*" onChange={handleImageChange} />
-      <button onClick={handleImageUpload} >Upload Image 1</button>
+      <button onClick={handleImageUpload} >Upload Images</button>
 
       <p>Please upload at least 3 pictures to continue.</p>
+      </div>
       <button onClick={handleNextClick} disabled={(uploadedPicturesCount < 3)}>Next</button>
       
     </div>

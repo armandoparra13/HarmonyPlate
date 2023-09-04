@@ -4,3 +4,84 @@
     justify-content: center;
     padding: 30px;
 }
+
+/* UploadPictures.css */
+
+.pictures-creation-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #8fb0a8;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-top: 100px;
+    
+  }
+  
+  .pictures-creation-container h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .profile-description h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .profile-description textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  .profile-description button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #F5CAC3;
+    color: black;
+    font-weight: 600;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    margin-left: 400px;
+  }
+  
+  .uploaded-images h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  
+  .uploaded-images input[type="file"] {
+    display: none;
+  }
+  
+  .uploaded-images button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #F5CAC3;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+   
+  }
+  
+  .uploaded-images p {
+    font-size: 14px;
+    color: #4e4d4d;
+    margin-top: 10px;
+  }
+  
+  button:disabled {
+    background-color: #dbc0c0;
+    cursor: not-allowed;
+  }
+  
