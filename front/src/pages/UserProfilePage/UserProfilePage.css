@@ -1,0 +1,65 @@
+/* UserProfilePage.css */
+
+/* Set up a flex container to fill the viewport */
+
+/* Ensure the grid container fills the available vertical space */
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two columns of equal width */
+  gap: 20px; /* Gap between columns */
+  background-color: #8fb0a8;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  flex-grow: 1; /* Grow to fill available space vertically */
+  height: 80vh;
+  width: 95%;
+}
+
+/* Style for left column */
+.left-column {
+  background-color: #F5CAC3;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  grid-column: 1; /* Left column */
+  display: flex;
+  flex-direction: row;
+  align-items: center; /* Center content horizontally within the left column */
+  justify-content: center; /* Center content vertically within the left column */
+  padding: 40px;
+}
+
+/* Style for right column */
+.right-column {
+  align-items: center; /* Center align the content horizontally */
+  grid-column: 2; /* Right column */
+  padding: 40px;
+  
+}
+
+.first-row {
+    display: flex; /* Create a flex container */
+    flex-direction: row; /* Display children elements in a row */
+    justify-content: flex-start; /* Align children elements to the start of the container (left-aligned) */
+    align-items: center; /* Vertically center the children elements */
+  }
+  
+  .image-container {
+    margin-right: 10px; /* Add some margin between the images */
+  }
+  
+  /* Adjust the image size as needed */
+  .images-displayed {
+    max-width: 200px; /* Set a maximum width for the images */
+    height: auto; /* Maintain the aspect ratio */
+  }
+  
+
+  .favorite-dish {
+    max-width: 50px; /* Set a maximum width for the image */
+    height: auto; /* Maintain the aspect ratio */
+    margin-top: 20px; /* Add some top margin to separate it from other content */
+  }

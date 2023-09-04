@@ -7,6 +7,7 @@ import FoodPage from './pages/FoodPage/FoodPage';
 import SpotifyLoginPage from './pages/SpotifyLoginPage/SpotifyLoginPage';
 import SpotifySuccessPage from './pages/SpotifyLoginPage/SpotifySuccessPage';
 import UploadPictures from './pages/ProfileCreationPage/UploadPictures';
+import UserProfilePage from './pages/UserProfilePage/UserProfilePage';
 import { useAuth } from './Auth';
 import axios from 'axios';
 import Sidebar from './components/Sidebar/Sidebar';
@@ -131,6 +132,20 @@ export const AppRoutes = () => {
                   element={
                     isUserDataComplete ? (
                       <HomePage />
+                    ) : (
+                      <>
+                        {!foodsChosen && <Navigate to="/food" />}
+                        {!spotifyLinked && <Navigate to="/spotify-login" />}
+                        {(picturesUploaded < 3) && <Navigate to="/upload-pictures" />}
+                      </>
+                    )
+                  }
+                />
+                <Route
+                  path="/user-profile"
+                  element={
+                    isUserDataComplete ? (
+                      <UserProfilePage />
                     ) : (
                       <>
                         {!foodsChosen && <Navigate to="/food" />}

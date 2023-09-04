@@ -359,7 +359,7 @@ app.get("/auth/getMatches", (req, res) => {
 app.get("/auth/recipe/:id", (req, res) => {
   let id = req.params.id;
   axios.get(`${spoonacularUrl}recipes/${id}/information?apiKey=${spoonacularApi}`).then(response => {
-    console.log(response);
+    console.log("get recipe", response);
     res.status(200).send(response.data);
   })
 })  
@@ -680,5 +680,25 @@ app.delete('/auth/delete-image', async (req, res) => {
 
 
 app.listen(port, hostname, () => {
-  console.log(`Server is running at http://${hostname}:${port}`);
+  console.log(`http://${hostname}:${port}`);
+})
+
+// Get info for user's profile
+app.get("/auth/getUserProfile", (req, res) => {
+  admin.auth()
+    .verifyIdToken(req.headers.authorization)
+    .then(decodedToken => {
+      const userRef = ref(database, 'users/' + decodedToken.uid);
+
+      onValue(userRef, (snapshot) => {
+        const userData = snapshot.val();
+        res.status(200).json(userData);
+      }, {
+        onlyOnce: true
+      });
+    })
+    .catch(error => {
+      console.error('Error while verifying token:', error);
+      res.status(500).send("Error while retrieving user profile");
+    });
 });
