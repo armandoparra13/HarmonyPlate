@@ -381,13 +381,29 @@ app.get("/auth/getMatchesInfo", async (req, res) => {
             reject(error);
           });
         });
+        const randomString = matchSnap.randomString || '';
+        const imagesDirectory = path.join('../front/public/uploads', randomString);
+        let images = []
+
+        try {
+          if (fs.existsSync(imagesDirectory)) {
+            const files = await fs.promises.readdir(imagesDirectory);
+            const userImages = files.filter((file) => file.startsWith(`${randomString}_`));
+            images = userImages.map((image) => `/uploads/${randomString}/${image}`);
+          }
+        } catch (err) {
+          console.error('Error reading user images directory:', err);
+          images = [];
+        }
+
 
         const matchInfo = {
           "name": matchSnap.username,
           "description": matchSnap.description || null,
           "gender": matchSnap.gender || null,
           "cuisine": matchSnap.food ? matchSnap.food.cuisine : null,
-          "artist": matchSnap.spotify ? matchSnap.spotify.artistNames[0] : null
+          "artist": matchSnap.spotify ? matchSnap.spotify.artistNames[0] : null,
+          "images": images
         };
 
         matchList.push(matchInfo);
@@ -395,7 +411,7 @@ app.get("/auth/getMatchesInfo", async (req, res) => {
     } else {
       return res.status(500).json("No pool");
     }
-
+    console.log(matchList)
     return res.status(200).json(matchList);
   } catch (error) {
     console.error(error);
@@ -405,6 +421,7 @@ app.get("/auth/getMatchesInfo", async (req, res) => {
 
 app.post("/auth/addMatch", async (req, res) => {
   try {
+    console.log("Inside add Match")
     const decodedToken = await admin.auth().verifyIdToken(req.headers.authorization);
     const usersSnapshot = await ref(database, 'users/' + decodedToken.uid);
     const userSnap = await new Promise((resolve, reject) => {
@@ -414,10 +431,12 @@ app.post("/auth/addMatch", async (req, res) => {
         reject(error);
       });
     });
-
+    console.log("Liked");
     let currentPool = userSnap.pool ? userSnap.pool : [];
     let currentMatched = userSnap.matched ? userSnap.matched : [];
+    console.log(currentPool);
     let liked = currentPool.shift();
+    console.log(liked);
     currentMatched.push(liked)
     update(ref(database, 'users/' + decodedToken.uid), {
       pool: currentPool,
