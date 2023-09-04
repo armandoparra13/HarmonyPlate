@@ -17,7 +17,7 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
 
   useEffect(() => {
 
-    //fetchUserData();
+    fetchUserData();
     fetchUserImages();
   }, [uploading]);
 
@@ -94,8 +94,10 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
   }
 
 
-  const handleImageChange = (event) => {
-    setSelectedImage(event.target.files[0]);
+  const handleImageChange = (e) => {
+    e.preventDefault(); 
+    setSelectedImage(e.target.files[0]);
+    
   };
 
   
@@ -128,13 +130,18 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
       
       const updatedPicCount = response.data.picturesCount;
       
+      if (response.status === 200) {
+        fetchUserImages();
+        fetchUserData();
+      } else {
+        console.error('Upload failed with status:', response.status);
+      }
 
     } catch (error) {
       console.error(error);
     } finally {
       setUploading(false);
-      fetchUserImages();
-      fetchUserData();
+  
     }
   };
 
@@ -206,7 +213,7 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
       </div>
       </div>
   
-      <div>
+      <div className="overall-images">
         {imageUrls.map((imageUrl, index) => (
           <div key={index} className="image-container">
             <div className="image-wrapper">
