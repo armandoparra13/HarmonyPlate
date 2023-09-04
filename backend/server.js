@@ -1,7 +1,7 @@
 import express from 'express';
 import { initializeApp } from 'firebase/app';
 import { getDatabase, limitToFirst, ref, set, update, query, orderByKey, onValue, get} from "firebase/database";
-import env from './env_backend.json' assert { type: 'json' };
+
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import axios from 'axios';
 import admin from 'firebase-admin';

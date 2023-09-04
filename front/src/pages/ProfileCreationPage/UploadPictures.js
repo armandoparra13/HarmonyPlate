@@ -95,7 +95,7 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
 
 
   const handleImageChange = (e) => {
-    e.preventDefault(); 
+    //e.preventDefault(); 
     setSelectedImage(e.target.files[0]);
     
   };
