@@ -12,34 +12,22 @@ import path from 'path';
 import multer from 'multer';
 import fs from 'fs';
 import bodyParser from 'body-parser';
-import { decode } from 'punycode';
-
-
+import 'dotenv/config'
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(bodyParser.json());
 
-let api_key = env['apiKey'];
-let domain = env['authDomain'];
-let db_url = env['databaseURL'];
-let project_id = env['projectId'];
-let storage_bucket = env['storageBucket'];
-let mess_sender = env['messagingSenderId'];
-let app_id = env['appId'];
-let measure_id = env['measurementId'];
-
-
 const firebaseConfig = {
-  apiKey: api_key,
-  authDomain: domain,
-  databaseURL: db_url,
-  projectId: project_id,
-  storageBucket: storage_bucket,
-  messagingSenderId: mess_sender,
-  appId: app_id,
-  measurementId: measure_id,
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  databaseURL: process.env.REACT_APP_FIREBASE_DATABASE_URL,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase, Realtime Database, Authentication
@@ -50,8 +38,22 @@ const auth = getAuth();
 const port = 5000;
 const hostname = "localhost";
 
+const serviceAccountConfig = {
+  "type": process.env.TYPE,
+  "project_id": process.env.PROJECT_ID,
+  "private_key_id": process.env.PRIVATE_KEY_ID,
+  "private_key": process.env.PRIVATE_KEY,
+  "client_email": process.env.CLIENT_EMAIL,
+  "client_id": process.env.CLIENT_ID,
+  "auth_uri": process.env.AUTH_URI,
+  "token_uri": process.env.TOKEN_URI,
+  "auth_provider_x509_cert_url": process.env.AUTH_PROVIDER,
+  "client_x509_cert_url": process.env.CLIENT_CERT_URL,
+  "universe_domain": process.env.UNIVERSE_DOMAIN
+}
+
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
+  credential: admin.credential.cert(serviceAccountConfig),
   databaseURL: "https://harmonyplate-68e8b-default-rtdb.firebaseio.com"
 });
 
