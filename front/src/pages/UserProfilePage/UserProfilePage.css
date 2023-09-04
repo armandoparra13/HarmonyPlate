@@ -1,3 +1,72 @@
+/* UserProfilePage.css */
+
+/* Reset margin and padding for html and body elements */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+/* Set up a flex container to fill the viewport */
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+/* Ensure the grid container fills the available vertical space */
 .grid-container {
-    display: inline-grid;
-  }
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two columns of equal width */
+  gap: 20px; /* Gap between columns */
+  background-color: #8fb0a8;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  flex-grow: 1; /* Grow to fill available space vertically */
+  height: 80vh;
+  width: 900px;
+}
+
+/* Style for left column */
+.left-column {
+  background-color: #F5CAC3;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  grid-column: 1; /* Left column */
+  display: flex;
+  flex-direction: row;
+  align-items: center; /* Center content horizontally within the left column */
+  justify-content: center; /* Center content vertically within the left column */
+  padding: 40px;
+}
+
+/* Style for right column */
+.right-column {
+  align-items: center; /* Center content vertically within the right column */
+  justify-content: center; /* Center content horizontally within the right column */
+  text-align: center;
+  grid-column: 2; /* Right column */
+  padding: 40px;
+}
+
+/* Style for user image */
+.user-image {
+  max-width: 100%; /* Adjust the image size as needed */
+  height: auto;
+}
+
+.text-box {
+  background-color: #FFFFFF;
+  border-radius: 5px;
+  width: 100%; /* Set the width of the text box relative to the left column's width */
+  height: 400px;
+  padding: 20px; /* Add padding to the text box as needed */
+  width: 70%;
+  height: auto;
+  border-radius: 30px;
+}
