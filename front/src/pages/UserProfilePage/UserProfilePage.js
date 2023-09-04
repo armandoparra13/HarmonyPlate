@@ -50,12 +50,13 @@ function UserProfilePage() {
         
     return (
         <div className='grid-containter'>
-            <div class="grid-item">1</div>
+            <div className="grid-item">1</div>
             <h1>User Profile</h1>
                 
-                <div class="grid-item">2</div>
+                <div className="grid-item">2</div>
             {userData ? (
                 <div>
+                <img src="/uploads/abcdef/Funny-Cat-Hidden.jpg" alt="upload" ></img>
                 <p>Username: {userData.username}</p>
                 <p>Description: {userData.description}</p>
                 <p>Email: {userData.email}</p>
