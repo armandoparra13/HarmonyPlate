@@ -37,7 +37,7 @@ function LoginPage() {
     try {
       await login(email, password);
       console.log("worked");
-      navigate('/create-profile');
+      navigate('/homepage');
     } catch (error) {
       console.log('Error logging in:', error)
     }

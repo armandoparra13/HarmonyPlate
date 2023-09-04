@@ -11,13 +11,18 @@ import { useAuth } from '../../Auth'
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+const defaultUserData = {
+    picturesUploaded: 0,
+    spotifyLinked: false,
+    foodsChosen: false,
+  };
 
 const Sidebar = ({ children }) => {
     const [isOpen, setIsOpen] = useState(false);
     const toggle = () => setIsOpen(!isOpen);
     const { logout, currentUser } = useAuth()
     const navigate = useNavigate();
-    const [userData, setUserData] = useState(null);
+    const [userData, setUserData] = useState(defaultUserData); 
     const { picturesUploaded, spotifyLinked, foodsChosen } = userData || {};
     const menuItem = [
         {
@@ -75,7 +80,7 @@ const Sidebar = ({ children }) => {
     return (
         <div className="sidebarContainer">
             {
-                userData && picturesUploaded && spotifyLinked && foodsChosen &&
+                userData && (picturesUploaded >= 3) && spotifyLinked && foodsChosen &&
                 (<div style={{ width: isOpen ? "300px" : "50px" }} className="sidebar">
                     <div className="topSection">
                         <h1 style={{ display: isOpen ? "block" : "none" }} className="logo">HarmonyPlate</h1>

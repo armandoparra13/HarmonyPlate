@@ -57,6 +57,9 @@ export const AppRoutes = () => {
 
   const { picturesUploaded, spotifyLinked, foodsChosen } = userData || {};
 
+  const isUserDataComplete =
+  spotifyLinked && picturesUploaded >= 3 && foodsChosen;
+
   return (
     <div>
       <Router>
@@ -84,8 +87,10 @@ export const AppRoutes = () => {
                 <Route
                   path="/food"
                   element={
-                    spotifyLinked && picturesUploaded && foodsChosen ? (
+                    isUserDataComplete ? (
+                      <Sidebar>
                       <Navigate to="/homepage" />
+                      </Sidebar>
                     ) : (
                       <FoodPage setUserData={setUserData}
                         setLoadingUserData={setLoadingUserData} />
@@ -97,7 +102,7 @@ export const AppRoutes = () => {
                 <Route
                   path="/spotify-login"
                   element={
-                    spotifyLinked && picturesUploaded && foodsChosen ? (
+                    isUserDataComplete ? (
                       <Navigate to="/homepage" />
                     ) : (
                       <SpotifyLoginPage setUserData={setUserData}
@@ -112,7 +117,7 @@ export const AppRoutes = () => {
                     currentUser && loadingUserData ? (
                       <LoadingComponent />
                     ) : (
-                      spotifyLinked && picturesUploaded && foodsChosen ? (
+                      isUserDataComplete ? (
                         <Navigate to="/homepage" />
                       ) : (
                         <UploadPictures setUserData={setUserData}
@@ -124,13 +129,13 @@ export const AppRoutes = () => {
                 <Route
                   path="/homepage"
                   element={
-                    spotifyLinked && picturesUploaded && foodsChosen ? (
+                    isUserDataComplete ? (
                       <HomePage />
                     ) : (
                       <>
                         {!foodsChosen && <Navigate to="/food" />}
                         {!spotifyLinked && <Navigate to="/spotify-login" />}
-                        {!picturesUploaded && <Navigate to="/upload-pictures" />}
+                        {(picturesUploaded < 3) && <Navigate to="/upload-pictures" />}
                       </>
                     )
                   }
@@ -138,13 +143,13 @@ export const AppRoutes = () => {
                 <Route
                   path="/SignUp"
                   element={
-                    spotifyLinked && picturesUploaded && foodsChosen ? (
+                    isUserDataComplete ? (
                       <Navigate to="/homepage" />
                     ) : (
                       <>
                         {!foodsChosen && <Navigate to="/food" />}
                         {!spotifyLinked && <Navigate to="/spotify-login" />}
-                        {!picturesUploaded && <Navigate to="/upload-pictures" />}
+                        {(picturesUploaded < 3) && <Navigate to="/upload-pictures" />}
                       </>
                     )
                   }
@@ -153,13 +158,13 @@ export const AppRoutes = () => {
                 <Route
                   path="/"
                   element={
-                    spotifyLinked && picturesUploaded && foodsChosen ? (
+                    isUserDataComplete ? (
                       <Navigate to="/homepage" />
                     ) : (
                       <>
                         {!foodsChosen && <Navigate to="/food" />}
                         {!spotifyLinked && <Navigate to="/spotify-login" />}
-                        {!picturesUploaded && <Navigate to="/upload-pictures" />}
+                        {(picturesUploaded < 3) && <Navigate to="/upload-pictures" />}
 
                       </>
                     )
@@ -169,18 +174,32 @@ export const AppRoutes = () => {
                 <Route
                   path="/matching"
                   element={
-                    spotifyLinked && picturesUploaded && foodsChosen ? (
+                    isUserDataComplete ? (
                       <MatchingPage />
                     ) : (
                       <>
                         {!foodsChosen && <Navigate to="/food" />}
                         {!spotifyLinked && <Navigate to="/spotify-login" />}
-                        {!picturesUploaded && <Navigate to="/upload-pictures" />}
+                        {(picturesUploaded < 3) && <Navigate to="/upload-pictures" />}
                       </>
                     )
                   }
                 />
 
+                <Route
+                  path="/*"
+                  element={
+                    isUserDataComplete ? (
+                      <HomePage />
+                    ) : (
+                      <>
+                        {!foodsChosen && <Navigate to="/food" />}
+                        {!spotifyLinked && <Navigate to="/spotify-login" />}
+                        {(picturesUploaded < 3) && <Navigate to="/upload-pictures" />}
+                      </>
+                    )
+                  }
+                />
 
               </>
             )}
