@@ -84,8 +84,8 @@ function UserProfilePage() {
                         <div className="second-row">
                             <h2>{userData.username}</h2>
                             <div className="input-group">
-                                <label>Description</label>
-                                <input className="custom-input" disabled value={userData.description} />
+                                <label>Description:</label>
+                                <textarea className="desc-input" disabled value={userData.description} />
                             </div>
                         </div>
                     </div>
@@ -94,6 +94,7 @@ function UserProfilePage() {
                 )}
             </div>
             <div className="right-column">
+            <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"></link>
                 {userData ? (
                     <div>
                         <div className="input-group">
