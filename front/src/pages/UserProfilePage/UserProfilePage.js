@@ -47,25 +47,25 @@ function UserProfilePage() {
 
         const fetchUserImages = async () => {
             try {
-              const response = await axios.get('/auth/fetch-user-images', {
-                headers: {
-                  Authorization: `Bearer ${currentUser.accessToken}`,
-                },
-              });
-              if (response.data) {
-                setImageUrls(response.data.imageUrls);
-                console.log(response.data.imageUrls);
-              }
-              
+                const response = await axios.get('/auth/fetch-user-images', {
+                    headers: {
+                        Authorization: `Bearer ${currentUser.accessToken}`,
+                    },
+                });
+                if (response.data) {
+                    setImageUrls(response.data.imageUrls);
+                    console.log(response.data.imageUrls);
+                }
+
             } catch (error) {
-              console.error('Error fetching user images:', error);
+                console.error('Error fetching user images:', error);
             }
-          };
+        };
 
         fetchUserData();
     }, [currentUser.accessToken]);
 
-    
+
 
     return (
         <div className='grid-container'>
@@ -73,13 +73,13 @@ function UserProfilePage() {
                 {userData ? (
                     <div>
                         <div className="first-row">
-                        {imageUrls.map((imageUrl, index) => (
-                        <div key={index} className="image-container">
-                            <div className="image-wrapper">
-                            <img src={imageUrl} alt={`User Image ${index}`} className="images-displayed" />
-                        </div>
-                    </div>
-                    ))}
+                            {imageUrls.map((imageUrl, index) => (
+                                <div key={index} className="image-container">
+                                    <div className="image-wrapper">
+                                        <img src={imageUrl} alt={`User Image ${index}`} className="images-displayed" />
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                         <div className="second-row">
                             <h2>{userData.username}</h2>
@@ -116,7 +116,7 @@ function UserProfilePage() {
                         <div className="input-group">
                             <label>Favorite Dish</label>
                             <input className="custom-input" disabled value={favoriteFoodTitle} />
-                        </div>                     
+                        </div>
                     </div>
                 ) : null}
             </div>

@@ -34,7 +34,6 @@ export const AppRoutes = () => {
 
           });
 
-          console.log(response.data);
           setUserData(response.data);
         } catch (error) {
           console.error('Error fetching user data:', error);

@@ -67,7 +67,6 @@ const Sidebar = ({ children }) => {
     async function handleLogout() {
 
         try {
-            console.log(currentUser);
             await logout();
             await window.location.reload(false);
             navigate('/');
