@@ -128,6 +128,7 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
         },
       });
       
+      console.log('HIIIII')
       const updatedPicCount = response.data.picturesCount;
       
       if (response.status === 200) {
