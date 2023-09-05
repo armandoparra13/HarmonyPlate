@@ -108,10 +108,10 @@ const ChatFooter = ({
               id={userData.username === messageContent.author ? 'you' : 'other'}
             >
               <div>
-                <div className="message-content">
+                <div className="message__sender">
                   <p>{messageContent.message}</p>
                 </div>
-                <div className="message-meta">
+                <div className="sender__name">
                   <p id="time">{messageContent.time}</p>
                   <p id="author">{messageContent.author}</p>
                 </div>
