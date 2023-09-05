@@ -10,7 +10,7 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
   let [description, setDescription] = useState('');
-  const [uploadedPicturesCount, setUploadedPicturesCount] = useState(0); 
+  const [uploadedPicturesCount, setUploadedPicturesCount] = useState(0);
   const [uploading, setUploading] = useState(false);
 
   const [imageUrls, setImageUrls] = useState([]);
@@ -34,7 +34,7 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
         setImageUrls(response.data.imageUrls);
         console.log(response.data.imageUrls);
       }
-      
+
     } catch (error) {
       console.error('Error fetching user images:', error);
     }
@@ -56,10 +56,9 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
           console.log(response.data.picturesUploaded);
           console.log(uploadedPicturesCount);
         }
-        console.log(response.data);
         setUserData(response.data);
 
-        
+
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -95,32 +94,32 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
 
 
   const handleImageChange = (e) => {
-    e.preventDefault(); 
+    e.preventDefault();
+    fetchUserImages();
+    fetchUserData();
     setSelectedImage(e.target.files[0]);
-    
+
   };
 
-  
+
 
   const handleImageUpload = async (e) => {
 
 
     //e.preventDefault(); 
     if (!selectedImage || !currentUser) {
-      console.log('ok');
       console.log('selectedImage:', selectedImage);
       return;
     }
-  
 
-  
-    console.log('yuh');
+
     setUploading(true);
     const formData = new FormData();
     formData.append('image', selectedImage);
-  
+
 
     try {
+      console.log('Before axios.post');
       const response = await axios.post('/auth/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -130,10 +129,11 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
       
       console.log('HIIIII')
       const updatedPicCount = response.data.picturesCount;
-      
+
+      fetchUserImages();
+      fetchUserData();
       if (response.status === 200) {
-        fetchUserImages();
-        fetchUserData();
+        
         console.log('HEYHKFBKMJSBFKS');
       } else {
         console.error('Upload failed with status:', response.status);
@@ -143,12 +143,12 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
       console.error(error);
     } finally {
       setUploading(false);
-  
+
     }
   };
 
   const handleDeleteImage = async (imageUrl) => {
-  
+
     try {
       await axios.delete('/auth/delete-image', {
         headers: {
@@ -166,8 +166,8 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
 
   const handleNextClick = () => {
 
-    
-    if (uploadedPicturesCount >= 3 ) {
+
+    if (uploadedPicturesCount >= 3) {
       navigate("/spotify-login");
     } else {
       alert("Please upload at least 3 pictures.");
@@ -180,13 +180,13 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
         <h3 className="add-desc">Add a description about yourself:</h3>
         <h2 className="upload-pics-header">Upload profile pictures:</h2>
       </div>
-        <div className="side-by-side">
+      <div className="side-by-side">
         <div className="profile-description">
           <form onSubmit={handleDescSubmit}>
             <label>
-            
+
               <textarea
-                style={{ float:'left', width: '400px', height: '70px'}}
+                style={{ float: 'left', width: '400px', height: '70px' }}
                 value={description}
                 onChange={handleDescChange}
                 rows="4"
@@ -197,42 +197,42 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
             <button type="submit">Save Description</button>
           </form>
         </div>
-      
-      
-      <div className="uploaded-images">
-        <div className="upload-buttons">
-        <input
-          className="choose-button"
-          type="file"
-          accept="image/*"
-          onChange={handleImageChange}
-    
-        />
-     
-        <button type="button" onClick={handleImageUpload} >Upload Image</button>
+
+
+        <div className="uploaded-images">
+          <div className="upload-buttons">
+            <input
+              className="choose-button"
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+
+            />
+
+            <button type="button" onClick={handleImageUpload} >Upload Image</button>
+          </div>
+          <p>Please upload at least 3 pictures to continue.</p>
         </div>
-        <p>Please upload at least 3 pictures to continue.</p>
       </div>
-      </div>
-  
+
       <div className="overall-images">
         {imageUrls.map((imageUrl, index) => (
           <div key={index} className="image-container">
             <div className="image-wrapper">
-            <img src={imageUrl} alt={`User Image ${index}`} className="images-displayed" />
-            <button
-              className="delete-button"
-              onClick={() => handleDeleteImage(imageUrl)}
-            >
-              X
-            </button>
-          </div>
+              <img src={imageUrl} alt={`User Image ${index}`} className="images-displayed" />
+              <button
+                className="delete-button"
+                onClick={() => handleDeleteImage(imageUrl)}
+              >
+                X
+              </button>
+            </div>
           </div>
         ))}
       </div>
-      
+
       <button onClick={handleNextClick} disabled={(uploadedPicturesCount < 3)}>Next</button>
-      
+
     </div>
   );
 }

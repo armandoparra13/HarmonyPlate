@@ -15,14 +15,14 @@ const defaultUserData = {
     picturesUploaded: 0,
     spotifyLinked: false,
     foodsChosen: false,
-  };
+};
 
 const Sidebar = ({ children }) => {
     const [isOpen, setIsOpen] = useState(false);
     const toggle = () => setIsOpen(!isOpen);
     const { logout, currentUser } = useAuth()
     const navigate = useNavigate();
-    const [userData, setUserData] = useState(defaultUserData); 
+    const [userData, setUserData] = useState(defaultUserData);
     const { picturesUploaded, spotifyLinked, foodsChosen } = userData || {};
     const menuItem = [
         {
@@ -37,7 +37,7 @@ const Sidebar = ({ children }) => {
             icon: <FaRocketchat />
         },
         {
-            path: "/profile",
+            path: "/user-profile",
             name: "Profile",
             icon: <FaUserAlt />
         },
@@ -67,7 +67,6 @@ const Sidebar = ({ children }) => {
     async function handleLogout() {
 
         try {
-            console.log(currentUser);
             await logout();
             await window.location.reload(false);
             navigate('/');

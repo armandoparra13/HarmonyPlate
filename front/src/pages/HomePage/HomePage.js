@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../Auth';
 import axios from 'axios';
 import './HomePage.css';
-import { useLocation } from 'react-router-dom';
 
 const HomePage = () => {
     const { currentUser, logout } = useAuth();

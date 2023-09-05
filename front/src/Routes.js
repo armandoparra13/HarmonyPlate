@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import LoginPage from './pages/LoginPage/LoginPage';
-import { MatchingPage } from './pages/MatchingPage/MatchingPage';
 import SignUp from './pages/SignUpPage/SignUpPage';
 import FoodPage from './pages/FoodPage/FoodPage';
 import SpotifyLoginPage from './pages/SpotifyLoginPage/SpotifyLoginPage';
@@ -35,7 +34,6 @@ export const AppRoutes = () => {
 
           });
 
-          console.log(response.data);
           setUserData(response.data);
         } catch (error) {
           console.error('Error fetching user data:', error);
@@ -59,7 +57,7 @@ export const AppRoutes = () => {
   const { picturesUploaded, spotifyLinked, foodsChosen } = userData || {};
 
   const isUserDataComplete =
-  spotifyLinked && picturesUploaded >= 3 && foodsChosen;
+    spotifyLinked && picturesUploaded >= 3 && foodsChosen;
 
   return (
     <div>
@@ -90,7 +88,7 @@ export const AppRoutes = () => {
                   element={
                     isUserDataComplete ? (
                       <Sidebar>
-                      <Navigate to="/homepage" />
+                        <Navigate to="/homepage" />
                       </Sidebar>
                     ) : (
                       <FoodPage setUserData={setUserData}
@@ -181,21 +179,6 @@ export const AppRoutes = () => {
                         {!spotifyLinked && <Navigate to="/spotify-login" />}
                         {(picturesUploaded < 3) && <Navigate to="/upload-pictures" />}
 
-                      </>
-                    )
-                  }
-                />
-
-                <Route
-                  path="/matching"
-                  element={
-                    isUserDataComplete ? (
-                      <MatchingPage />
-                    ) : (
-                      <>
-                        {!foodsChosen && <Navigate to="/food" />}
-                        {!spotifyLinked && <Navigate to="/spotify-login" />}
-                        {(picturesUploaded < 3) && <Navigate to="/upload-pictures" />}
                       </>
                     )
                   }
