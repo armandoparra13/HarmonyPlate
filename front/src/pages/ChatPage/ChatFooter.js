@@ -96,7 +96,7 @@ const ChatFooter = ({
       <div className="message__container">
         <div className="message__starter">
           Cool! Your match likes {''}
-          {matchFood || 'your favourite food too!'}
+          {matchFood || 'your favorite food too!'}
           {'!'}
         </div>
 
