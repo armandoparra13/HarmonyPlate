@@ -58,7 +58,6 @@ admin.initializeApp({
 app.post("/auth/signup", (req, res) => {
   // verify input is valid
   let body = req.body;
-  console.log(body);
 
   if (
     !body.hasOwnProperty("username") ||
@@ -127,7 +126,6 @@ var generateRandomString = function (length) {
 };
 
 app.get('/auth/spotify', function (req, res) {
-  console.log('login');
   var state = req.query.accessToken;
   var scope = 'user-read-private user-read-email user-top-read';
 
@@ -139,7 +137,7 @@ app.get('/auth/spotify', function (req, res) {
     redirect_uri: REDIRECT_URI,
     state: state
   })
-  //console.log("state", state);
+
 
   const spotifyAuthUrl = 'https://accounts.spotify.com/authorize/?' + auth_query_parameters.toString();
 
@@ -150,7 +148,6 @@ app.get('/auth/spotify', function (req, res) {
 app.get('/auth/spotify-success', (req, res) => {
 
   var code = req.query.code;
-  console.log(code);
   let firebaseAccessToken = req.query.state;
 
   var authOptions = {
@@ -179,19 +176,6 @@ app.get('/auth/spotify-success', (req, res) => {
         const topArtists = response.data.items;
         const artistNames = topArtists.map(artist => artist.name);
         const artistGenres = topArtists.map(artist => artist.genres);
-        /*
-        topArtists.forEach(artist => {
-            const artistName = artist.name;
-            const artistGenres = artist.genres;
-            const artistPopularity = artist.popularity;
-
-            console.log(`Artist name: ${artistName}`);
-            console.log(`Genres: ${artistGenres.join(', ')}`);
-            
-        })
-        */
-        //res.send(`<pre>${JSON.stringify(response.data, null, 2)}</pre>`);
-        //console.log(response.data.name[0]);
         admin.auth()
           .verifyIdToken(firebaseAccessToken)
           .then(decodedToken => {
@@ -306,7 +290,6 @@ app.post("/auth/foodChoice", async (req, res) => {
     })
     .then(() => {
       console.log('Adding Favorite Food succeeded');
-      //res.redirect('/create-profile');
       return res.status(200).send('Food choice submitted successfully.');
     })
     .catch((error) => {
@@ -328,7 +311,6 @@ app.get("/auth/getMatches", (req, res) => {
           snapshot.forEach((childSnapshot) => {
             let childKey = childSnapshot.key;
             if (decodedToken.uid !== childKey) {
-              console.log(childKey);
               randomUserIds.push(childKey);
             }
           });
@@ -367,10 +349,6 @@ app.get("/auth/getMatchesInfo", async (req, res) => {
         reject(error);
       });
     });
-
-    // update(ref(database, 'users/' + decodedToken.uid), {
-    //   pool: ['FI7ZyNmZSrRLbUoy8q7GPf4cG5I2', 'M2n00HNm0fY236JDqfKRZFWKxwG3']
-    // })
 
     const matchList = [];
 
@@ -520,7 +498,6 @@ app.post("/auth/addIgnored", async (req, res) => {
 app.get("/auth/recipe/:id", (req, res) => {
   let id = req.params.id;
   axios.get(`${spoonacularUrl}recipes/${id}/information?apiKey=${spoonacularApi}`).then(response => {
-    console.log("get recipe", response);
     res.status(200).send(response.data);
   })
 })
@@ -529,14 +506,12 @@ app.get("/auth/recipe/:id", (req, res) => {
 
 app.post('/auth/submit-desc', async (req, res) => {
   let body = req.body;
-  console.log(body.desc);
   admin.auth()
     .verifyIdToken(req.headers.authorization)
     .then(decodedToken => {
       update(ref(database, 'users/' + decodedToken.uid), {
         description: body.desc
       }).catch(() => {
-        console.log("Adding desc failed");
         return res.status(500).send("Adding desc failure");
       })
     })
@@ -609,7 +584,6 @@ const storage = multer.diskStorage({
       const userRandomString = await getUserRandomString(req);
       const fileExtension = path.extname(file.originalname);
 
-      //console.log('User Random String:', userRandomString);
       const pictureNumber = pictureCounters[userRandomString] || 0; // Get the picture number for the user
 
       pictureCounters[userRandomString] = pictureNumber + 1;
@@ -629,7 +603,6 @@ const upload = multer({ storage });
 // Route to handle image upload
 app.post('/auth/upload', upload.single('image'), (req, res) => {
   if (req.file) {
-    console.log('File uploaded:', req.file);
 
     const idToken = req.headers.authorization?.replace('Bearer ', '');
 
@@ -770,7 +743,6 @@ app.get('/auth/fetch-user-images', async (req, res) => {
 app.delete('/auth/delete-image', async (req, res) => {
   const idToken = req.headers.authorization?.replace('Bearer ', '');
   const imageUrlToDelete = req.body.imageUrl;
-  console.log("delete:", imageUrlToDelete);
 
   try {
     if (!idToken || !imageUrlToDelete) {
@@ -787,7 +759,6 @@ app.delete('/auth/delete-image', async (req, res) => {
       const userData = snapshot.val();
       if (userData) {
         const randomString = userData.randomString || '';
-        //const userImagesDirectory = path.join('../front/public/uploads', randomString);
 
         if (fs.existsSync('../front/public')) {
 
@@ -795,13 +766,10 @@ app.delete('/auth/delete-image', async (req, res) => {
 
           if (fs.existsSync(imageFilePath)) {
             // Delete the image file
-            console.log('yuh');
             fs.unlinkSync(imageFilePath);
-            console.log(`Deleted image: ${imageFilePath}`);
             if (userData && userData.picturesUploaded !== undefined) {
               const currentCount = userData.picturesUploaded;
               const newCount = currentCount - 1;
-              console.log("New picture count:", newCount);
 
               update(ref(database, 'users/' + decodedToken.uid), {
                 picturesUploaded: newCount
