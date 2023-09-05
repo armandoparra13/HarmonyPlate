@@ -24,3 +24,22 @@
   justify-content: center;
   padding: 30px;
 }
+
+.spotify-success {
+  justify-content: center; 
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 90vh;
+}
+
+.spotify-success-text{
+  font-size: 24px;
+  color: #666;
+  margin: 10px 0;
+}
+
+.spotify-header{
+  font-size: 40px;
+  margin: 10px 0;
+}

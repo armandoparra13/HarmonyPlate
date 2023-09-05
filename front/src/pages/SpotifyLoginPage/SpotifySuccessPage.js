@@ -10,10 +10,10 @@ function SpotifySuccessPage({ }) {
   };
 
   return (
-    <div>
-      <h1>Spotify Login Success!</h1>
-      <p>Your Spotify login was successful.</p>
-      <button onClick={handleNextClick}>Next</button>
+    <div className="spotify-success">
+      <h1 className="spotify-header">Spotify Login Success!</h1>
+      <p className="spotify-success-text">Your Spotify login was successful.</p>
+      <button className="spotify-button" onClick={handleNextClick}>Next</button>
 
     </div>
   );
