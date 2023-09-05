@@ -4,10 +4,11 @@ import axios from 'axios';
 import './HomePage.css';
 
 const HomePage = () => {
-    const { currentUser, logout } = useAuth();
+    const { currentUser } = useAuth();
     const [matches, setMatches] = useState([]);
     const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
     const [error, setError] = useState('');
+    const currentMatch = matches[currentMatchIndex]
     const fetchUserData = async () => {
         if (currentUser) {
             try {
@@ -19,7 +20,7 @@ const HomePage = () => {
                 setMatches(response.data)
                 setCurrentMatchIndex(0);
             } catch (error) {
-                console.error('Error fetching matches data:', error);
+                console.log('Error fetching matches data:', error);
                 setError('No more matches')
             }
         }
@@ -39,7 +40,7 @@ const HomePage = () => {
                     Authorization: currentUser.accessToken,
                 },
             }).catch(e => {
-                console("Handle Like", e)
+                console.log("Handle Like", e)
             });
     }
     const handleSkip = () => {
@@ -51,23 +52,24 @@ const HomePage = () => {
                     Authorization: currentUser.accessToken,
                 },
             }).catch(e => {
-                console("Handle Skip", e)
+                console.log("Handle Skip", e)
             });
     }
+    console.log(currentMatch)
     return matches.length !== 0 ?
-        matches[currentMatchIndex] ?
+        currentMatch ?
             (<div className="main-content">
                 <div className="match-box">
                     <div className="match-card" key={currentMatchIndex}>
                         <button className="like-btn" onClick={handleLike}>Like</button>
                         <div className="match-info">
                             <div className="match-card-content">
-                                {matches[currentMatchIndex].randomString && matches[currentMatchIndex].images && matches[currentMatchIndex].randomString.length === 0 ?
-                                    (<img src="/uploads/PQ5oYgHbPd_1.png" className="match-card-image" />) : (<div>No Image</div>)}
-                                <h2 className="match-card-title">{matches[currentMatchIndex].name}</h2>
-                                <p className="match-card-description">{matches[currentMatchIndex].description}</p>
-                                <p className="match-card-food">Favorite Cuisine: {matches[currentMatchIndex].cuisine}</p>
-                                <p className="match-card-artist">Favorite Artist: {matches[currentMatchIndex].artist}</p>
+                                {currentMatch.images && currentMatch.images.length !== 0 ?
+                                    (<img src={currentMatch.images[1]} className="match-card-image" />) : (<div>No Image</div>)}
+                                <h2 className="match-card-title">{currentMatch.name}</h2>
+                                <p className="match-card-description">{currentMatch.description}</p>
+                                <p className="match-card-food">Favorite Cuisine: {currentMatch.cuisine}</p>
+                                <p className="match-card-artist">Favorite Artist: {currentMatch.artist}</p>
                             </div>
                         </div>
                         <button className="skip-btn" onClick={handleSkip}>Skip</button>
