@@ -14,7 +14,7 @@ const SignUp = () => {
         gender: 'Select'
     });
     const [errorMessage, setErrorMessage] = useState("");  // New error state
-    
+
     const navigate = useNavigate();
     const { login } = useAuth()
 
@@ -46,7 +46,6 @@ const SignUp = () => {
         try {
             const response = await axios.post('/auth/signup', dataToSend);
 
-            console.log(response.data);
             try {
                 await login(formData.email, formData.password);
                 navigate('/upload-pictures');
@@ -58,7 +57,7 @@ const SignUp = () => {
         }
     };
 
-   
+
 
     return (
         <div className="signUpContainer">
