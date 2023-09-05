@@ -23,6 +23,8 @@
   },
   "dependencies": {
     "firebase": "^10.1.0",
-    "firebase-admin": "^11.10.1"
+    "firebase-admin": "^11.10.1",
+    "socket.io": "^4.7.2",
+    "socket.io-client": "^4.7.2"
   }
 }
