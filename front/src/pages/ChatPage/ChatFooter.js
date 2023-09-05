@@ -13,7 +13,38 @@ const ChatFooter = ({
   const [currentMessage, setCurrentMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [messageList, setMessageList] = useState([]);
+  const [matchFood, setMatchFood] = useState(null);
 
+  const fetchFavoriteFood = async (foodId) => {
+    try {
+      if (foodId) {
+        const response = await fetch(`/auth/recipe/${foodId}`);
+        if (response.ok) {
+          const dishData = await response.json();
+          setMatchFood(dishData.title);
+        } else {
+          console.error('Error fetching favorite dish:', response.status);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching favorite dish:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (
+      selectedMatch &&
+      selectedMatch.matchProfile &&
+      selectedMatch.matchProfile.food &&
+      selectedMatch.matchProfile.food.favoriteFood
+    ) {
+      fetchFavoriteFood(selectedMatch.matchProfile.food.favoriteFood);
+    } else if (userData && userData.food && userData.food.favoriteFood) {
+      fetchFavoriteFood(userData.food.favoriteFood);
+    }
+  }, [selectedMatch, userData]);
+
+  console.log(selectedMatch);
   const handleTyping = () =>
     socket.emit('typing', `${userData.username} is typing`);
 
@@ -63,7 +94,11 @@ const ChatFooter = ({
       </header>
 
       <div className="message__container">
-        <div className="message__starter">Your match likes</div>
+        <div className="message__starter">
+          Cool! Your match likes {''}
+          {matchFood || 'your favourite food too!'}
+          {'!'}
+        </div>
 
         {messageList.map((messageContent, index) => {
           return (

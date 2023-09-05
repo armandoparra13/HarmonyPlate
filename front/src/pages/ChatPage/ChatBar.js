@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 //import Chat from '../../../public/uploads/'
 
-const ChatBar = ({ socket, userData, chooseMatch, assignRoom }) => {
+const ChatBar = ({ socket, userData, chooseMatch, assignRoom, assignFood }) => {
   const [matchesData, setMatchesData] = useState([]); // State to store matches data
   const [loading, setLoading] = useState(true); // State to track loading status
   const [selectedMatch, setSelectedMatch] = useState(null);
@@ -30,6 +30,7 @@ const ChatBar = ({ socket, userData, chooseMatch, assignRoom }) => {
     const fetchDataForPool = async () => {
       const matchesPromises = pool.map(async (uid) => {
         const matchProfile = await fetchMatchData(uid);
+
         return {
           uid,
           matchProfile,

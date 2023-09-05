@@ -17,7 +17,7 @@ const ChatPage = () => {
   const { currentUser } = useAuth();
   const [isUserSelected, setIsUserSelected] = useState(false);
   const [messageList, setMessageList] = useState([]);
-  const [favoriteFoodImage, setFavoriteFoodImage] = useState(null);
+
   const [favoriteFood, setFavoriteFood] = useState(null);
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [room, setRoom] = useState('');
