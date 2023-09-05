@@ -62,7 +62,7 @@ const Sidebar = ({ children }) => {
         }
 
         fetchUserData();
-    }, [currentUser]);
+    }, [currentUser, window.location.pathname]);
 
     async function handleLogout() {
 
