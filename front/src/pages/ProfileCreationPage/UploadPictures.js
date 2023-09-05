@@ -95,6 +95,8 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
 
   const handleImageChange = (e) => {
     e.preventDefault();
+    fetchUserImages();
+    fetchUserData();
     setSelectedImage(e.target.files[0]);
 
   };
@@ -117,18 +119,21 @@ function UploadPictures({ setUserData, setLoadingUserData }) {
 
 
     try {
+      console.log('Before axios.post');
       const response = await axios.post('/auth/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${currentUser.accessToken}`,
         },
       });
-
+      
+      console.log('HIIIII')
       const updatedPicCount = response.data.picturesCount;
 
+      fetchUserImages();
+      fetchUserData();
       if (response.status === 200) {
-        fetchUserImages();
-        fetchUserData();
+        
         console.log('HEYHKFBKMJSBFKS');
       } else {
         console.error('Upload failed with status:', response.status);

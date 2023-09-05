@@ -34,7 +34,9 @@ function LoginPage() {
   }
 
   return (
+    
     <div className="loginContainer">
+      <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"></link>
       <img className="bg-img" src="https://media.giphy.com/media/h7uTwqEHysbd2lhyDP/giphy.gif" />
 
       <div className="card">

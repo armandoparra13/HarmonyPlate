@@ -64,8 +64,15 @@ const HomePage = () => {
                         <button className="like-btn" onClick={handleLike}>Like</button>
                         <div className="match-info">
                             <div className="match-card-content">
-                                {currentMatch.images && currentMatch.images.length !== 0 ?
-                                    (<img src={currentMatch.images[1]} className="match-card-image" />) : (<div>No Image</div>)}
+                                <div className="image-container">
+                                {currentMatch.images.map((image, index) => (
+                                    <div key={index} className="image-container">
+                                        <div>
+                                            <img src={image} className="match-card-image" />
+                                        </div>
+                                    </div>
+                                ))}
+                                </div>
                                 <h2 className="match-card-title">{currentMatch.name}</h2>
                                 <p className="match-card-description">{currentMatch.description}</p>
                                 <p className="match-card-food">Favorite Cuisine: {currentMatch.cuisine}</p>

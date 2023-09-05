@@ -15,6 +15,8 @@
   flex-grow: 1; /* Grow to fill available space vertically */
   height: 80vh;
   width: 95%;
+  font-family: 'Roboto', sans-serif;
+  font-weight: bold;
 }
 
 /* Style for left column */
@@ -49,6 +51,7 @@
   
   .image-container {
     margin-right: 10px; /* Add some margin between the images */
+    
   }
   
   /* Adjust the image size as needed */
@@ -57,9 +60,18 @@
     height: auto; /* Maintain the aspect ratio */
   }
   
-
   .favorite-dish {
     max-width: 50px; /* Set a maximum width for the image */
     height: auto; /* Maintain the aspect ratio */
     margin-top: 20px; /* Add some top margin to separate it from other content */
+  }
+
+  .desc-input {
+    white-space: pre-wrap;
+    overflow: auto;
+    width: 100%;
+    overflow-wrap: break-word;
+    text-align: center;
+    font-family: 'Roboto', sans-serif;
+    
   }
