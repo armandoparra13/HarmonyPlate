@@ -30,6 +30,7 @@ const ChatBar = ({ socket, userData, chooseMatch, assignRoom, assignFood }) => {
     const fetchDataForPool = async () => {
       const matchesPromises = pool.map(async (uid) => {
         const matchProfile = await fetchMatchData(uid);
+
         return {
           uid,
           matchProfile,
